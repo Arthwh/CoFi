@@ -1,9 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
-
-// Importações de Telas e Componentes
 import HomeScreen from '../screens/HomeScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import { CustomAddButton } from '../components/CustomAddButton';
 
 const Tab = createBottomTabNavigator();
@@ -70,7 +69,7 @@ export default function AppRoutes() {
                         />
                         <Tab.Screen
                                 name="Perfil"
-                                component={HomeScreen}
+                                component={ProfileScreen}
                                 options={{
                                         tabBarIcon: ({ color }) => <Ionicons name="person" color={color} size={28} />
                                 }}

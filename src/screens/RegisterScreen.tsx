@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
 import { theme } from '../theme';
 import { authService } from '../services/authService';
 
 export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleRegister = async () => {
     try {
-      await authService.register(email, password, nome, cpf);
+      await authService.register(email, password, nome, cpf, telefone);
       Alert.alert('Sucesso', 'Conta criada! Faça login para continuar.');
       onSwitch(); // Volta para a tela de login após criar a conta
     } catch (error: any) {
@@ -26,6 +27,7 @@ export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
 
         <TextInput style={styles.input} placeholder="Nome Completo" value={nome} onChangeText={setNome} />
         <TextInput style={styles.input} placeholder="CPF (números)" keyboardType="numeric" value={cpf} onChangeText={setCpf} />
+        <TextInput style={styles.input} placeholder="Telefone (xx) xxxxx-xxxx" keyboardType="numeric" value={telefone} onChangeText={setTelefone} />
         <TextInput style={styles.input} placeholder="E-mail" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
         <TextInput style={styles.input} placeholder="Senha" secureTextEntry value={password} onChangeText={setPassword} />
 

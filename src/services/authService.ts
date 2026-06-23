@@ -11,7 +11,7 @@ export const authService = {
         },
 
         // Cadastro com os dados extras (Nome e CPF)
-        async register(email: string, password: string, nome: string, cpf: string) {
+        async register(email: string, password: string, nome: string, cpf: string, telefone: string) {
                 const { data, error } = await supabase.auth.signUp({
                         email,
                         password,
@@ -19,6 +19,7 @@ export const authService = {
                                 data: {
                                         full_name: nome,
                                         cpf: cpf,
+                                        phone: telefone
                                 }
                         }
                 });
@@ -46,5 +47,14 @@ export const authService = {
 
                 // Retorna a inscrição para podermos cancelar depois
                 return subscription;
+        },
+
+        async signOut() {
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                        console.error("Erro ao fazer logOut:", error);
+                        return error.message;
+                }
+                return null
         }
 };
