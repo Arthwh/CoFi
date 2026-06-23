@@ -17,7 +17,6 @@ export default function ProfileScreen() {
         const [email, setEmail] = useState('');
         const [createdAt, setCreatedAt] = useState('');
 
-        // Busca os dados assim que a tela abre
         useEffect(() => {
                 carregarDados();
         }, []);
@@ -179,7 +178,7 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
         container: { flex: 1, backgroundColor: theme.colors.background },
-        content: { padding: 24, paddingBottom: 120 }, // paddingBottom alto para não ficar atrás do menu inferior
+        content: { padding: 24, paddingBottom: 120 },
 
         shadow: {
                 shadowColor: theme.colors.primary,

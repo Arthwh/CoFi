@@ -3,6 +3,7 @@ import { Entypo, Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import AddTransactionScreen from '../screens/AddTransactionScreen';
 import { CustomAddButton } from '../components/CustomAddButton';
 
 const Tab = createBottomTabNavigator();
@@ -54,7 +55,7 @@ export default function AppRoutes() {
 
                         <Tab.Screen
                                 name="Adicionar"
-                                component={HomeScreen}
+                                component={AddTransactionScreen}
                                 options={{
                                         tabBarButton: (props) => <CustomAddButton {...props} />,
                                 }}

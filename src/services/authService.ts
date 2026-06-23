@@ -10,7 +10,7 @@ export const authService = {
                 return data;
         },
 
-        // Cadastro com os dados extras (Nome e CPF)
+        // Cadastro com os dados extras (Nome, CPF e telefone)
         async register(email: string, password: string, nome: string, cpf: string, telefone: string) {
                 const { data, error } = await supabase.auth.signUp({
                         email,
@@ -45,7 +45,7 @@ export const authService = {
                         callback(session?.user ?? null);
                 });
 
-                // Retorna a inscrição para podermos cancelar depois
+                // Retorna a inscrição
                 return subscription;
         },
 

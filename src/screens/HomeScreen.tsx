@@ -12,9 +12,6 @@ export default function HomeScreen() {
                                                 <Text style={styles.greeting}>Olá, João</Text>
                                                 <Text style={styles.subtitle}>Bem-vindo de volta!</Text>
                                         </View>
-                                        <TouchableOpacity style={styles.profileIcon}>
-                                                <Ionicons name="person-circle" size={40} color={theme.colors.primary} />
-                                        </TouchableOpacity>
                                 </View>
 
                                 <View style={[styles.card, styles.balanceCard, styles.shadow]}>
