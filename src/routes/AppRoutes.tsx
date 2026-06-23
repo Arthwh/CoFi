@@ -4,6 +4,7 @@ import { theme } from '../theme';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddTransactionScreen from '../screens/AddTransactionScreen';
+import TransactionsListScreen from '../screens/TransactionListScreen'
 import { CustomAddButton } from '../components/CustomAddButton';
 
 const Tab = createBottomTabNavigator();
@@ -47,7 +48,7 @@ export default function AppRoutes() {
                         />
                         <Tab.Screen
                                 name="Extrato"
-                                component={HomeScreen}
+                                component={TransactionsListScreen}
                                 options={{
                                         tabBarIcon: ({ color }) => <Ionicons name="list" color={color} size={28} />
                                 }}

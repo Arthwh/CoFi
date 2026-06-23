@@ -35,5 +35,21 @@ export const transactionService = {
                 }
 
                 return data[0];
+        },
+
+        async getTransactions() {
+                const { data, error } = await supabase
+                        .from('transactions') //Tabela
+                        .select(`
+                          *,
+                                category:categories!inner(id, name, icon, color)
+                        `);
+
+                if (error) {
+                        console.error('Erro ao obter transações:', error.message);
+                        throw error;
+                }
+
+                return data;
         }
 };
