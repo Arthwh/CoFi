@@ -11,7 +11,7 @@ export interface CreateTransactionPayload {
         category_id: string | null;
         date: string;
         status: TransactionStatus;
-        payment_method: PaymentMethod;
+        payment_method_id: string | null;
         frequency: 'single' | 'installment' | 'fixed';
         installments?: number;
         payee?: string;
@@ -42,7 +42,8 @@ export const transactionService = {
                         .from('transactions') //Tabela
                         .select(`
                           *,
-                                category:categories!inner(id, name, icon, color)
+                                category:categories!inner(id, name, icon, color),
+                                paymentMethod:payment_methods!inner(id, name, icon, color)
                         `);
 
                 if (error) {

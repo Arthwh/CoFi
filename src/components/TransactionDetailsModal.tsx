@@ -50,7 +50,7 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                         <View style={styles.detailsList}>
                                                 <DetailRow label="Data" value={transaction.date} icon="calendar-outline" />
                                                 <DetailRow label="Categoria" value={transaction.category.name} icon="grid-outline" />
-                                                <DetailRow label="Método" value={transaction.paymentMethod} icon="wallet-outline" />
+                                                <DetailRow label="Método" value={transaction.paymentMethod.name} icon="wallet-outline" />
                                                 {transaction.payee && <DetailRow label="Local / Pessoa" value={transaction.payee} icon="person-outline" />}
                                         </View>
 

@@ -8,9 +8,11 @@ import { PaymentMethodPicker, PaymentMethod } from '../components/PaymentMethodP
 import { CreateTransactionPayload, transactionService } from '../services/transactionService'
 import { userService } from '../services/userService';
 import { categoryService } from '../services/categoryService';
+import { paymentMethodService } from '../services/paymentMethodService';
 
 export default function AddTransactionScreen() {
-        const [categories, setCategories] = useState<Category[] | null>(null);
+        const [categories, setCategories] = useState<Category[]>([]);
+        const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
         const [userId, setUserId] = useState<string | null>(null);
         // Dados Principais
         const [type, setType] = useState<'income' | 'expense'>('expense');
@@ -21,7 +23,7 @@ export default function AddTransactionScreen() {
 
         // Status e Pagamento
         const [status, setStatus] = useState<TransactionStatus>('paid');
-        const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pix');
+        const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
 
         // Frequência e Parcelamento
         const [frequency, setFrequency] = useState<'single' | 'installment' | 'fixed'>('single');
@@ -56,6 +58,14 @@ export default function AddTransactionScreen() {
                 };
 
                 fetchCategories();
+
+                const fetchPaymentMethods = async () => {
+                        const data = await paymentMethodService.getPaymentMethods();
+                        console.log(data)
+                        if (data) setPaymentMethods(data);
+                };
+
+                fetchPaymentMethods();
         }, []);
 
         const handleSaveTransaction = async () => {
@@ -70,7 +80,7 @@ export default function AddTransactionScreen() {
                         category_id: selectedCategory?.id ? selectedCategory.id : null,
                         date: dataFormatada,
                         status,
-                        payment_method: paymentMethod,
+                        payment_method_id: selectedPaymentMethod?.id ? selectedPaymentMethod.id : null,
                         frequency,
                         installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
                         payee,
@@ -96,7 +106,7 @@ export default function AddTransactionScreen() {
                 setSelectedCategory(null);
                 setDate(new Date().toLocaleDateString('pt-BR'));
                 setStatus('paid');
-                setPaymentMethod('pix');
+                setSelectedPaymentMethod(null);
                 setFrequency('single');
                 setInstallmentsCount('2');
                 setPayee('');
@@ -212,7 +222,7 @@ export default function AddTransactionScreen() {
                                 <View style={[styles.card, styles.shadow]}>
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Método de Pagamento</Text>
-                                                <PaymentMethodPicker selected={paymentMethod} onChange={setPaymentMethod} />
+                                                <PaymentMethodPicker selected={selectedPaymentMethod} paymentMethods={paymentMethods!} onChange={setSelectedPaymentMethod} />
                                         </View>
 
                                         <View style={styles.divider} />

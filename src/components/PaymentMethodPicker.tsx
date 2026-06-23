@@ -2,33 +2,31 @@ import { ScrollView, TouchableOpacity, Text, StyleSheet, View } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 
-export type PaymentMethod = 'pix' | 'credit' | 'debit' | 'cash' | 'transfer' | 'boleto';
+// Tipagem para os Métodos de Pagamento
+export interface PaymentMethod {
+        id: string;
+        name: string;
+        icon: keyof typeof Ionicons | string;
+        color: string;
+}
 
 interface PaymentMethodPickerProps {
-        selected: PaymentMethod;
+        selected: PaymentMethod | null;
+        paymentMethods: PaymentMethod[];
         onChange: (method: PaymentMethod) => void;
 }
 
-const METHODS: { id: PaymentMethod; name: string; icon: String }[] = [
-        { id: 'pix', name: 'Pix', icon: 'qr-code-outline' },
-        { id: 'credit', name: 'Crédito', icon: 'card-outline' },
-        { id: 'debit', name: 'Débito', icon: 'card' },
-        { id: 'cash', name: 'Dinheiro', icon: 'cash-outline' },
-        { id: 'transfer', name: 'Transferência', icon: 'swap-horizontal-outline' },
-        { id: 'boleto', name: 'Boleto', icon: 'barcode-outline' },
-];
-
-export function PaymentMethodPicker({ selected, onChange }: PaymentMethodPickerProps) {
+export function PaymentMethodPicker({ selected, paymentMethods, onChange }: PaymentMethodPickerProps) {
         return (
                 <View style={{ marginHorizontal: -20 }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                                {METHODS.map((method) => {
-                                        const isActive = selected === method.id;
+                                {paymentMethods.map((method) => {
+                                        const isActive = selected?.id === method.id;
                                         return (
                                                 <TouchableOpacity
                                                         key={method.id}
                                                         style={[styles.chip, isActive && styles.chipActive]}
-                                                        onPress={() => onChange(method.id)}
+                                                        onPress={() => onChange(method)}
                                                 >
                                                         <Ionicons name={method.icon as any} size={18} color={isActive ? '#FFF' : theme.colors.textLight} />
                                                         <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{method.name}</Text>
