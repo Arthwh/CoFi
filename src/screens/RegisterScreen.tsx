@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
 import { theme } from '../theme';
 import { authService } from '../services/authService';
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
 export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
         const [nome, setNome] = useState('');
@@ -10,7 +11,10 @@ export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
 
+        const [loading, setLoading] = useState(false);
+
         const handleRegister = async () => {
+                setLoading(true);
                 try {
                         await authService.register(email, password, nome, cpf, telefone);
                         Alert.alert('Sucesso', 'Conta criada! Faça login para continuar.');
@@ -18,7 +22,12 @@ export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
                 } catch (error: any) {
                         Alert.alert('Erro', error.message);
                 }
+                setLoading(false)
         };
+
+        if (loading) {
+                return <LoadingIndicator message="Carregando suas movimentações..." />;
+        }
 
         return (
                 <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>

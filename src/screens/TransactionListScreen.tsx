@@ -6,6 +6,7 @@ import { TransactionFilters, FilterType } from '../components/TransactionFilters
 import { TransactionDetailsModal } from '../components/TransactionDetailsModal';
 import { transactionService } from '../services/transactionService';
 import { dateUtils, DateInfo } from '../utils/dateUtils'
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
 export default function TransactionsListScreen() {
         const [currentDateInfo, setCurrentDateInfo] = useState<DateInfo>(dateUtils.parseDateData());
@@ -70,13 +71,9 @@ export default function TransactionsListScreen() {
         };
 
         if (loading) {
-                return (
-                        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                                <ActivityIndicator size="large" color={theme.colors.primary} />
-                        </View>
-                );
+                return <LoadingIndicator message="Carregando suas movimentações..." />;
         }
-
+        
         return (
                 <SafeAreaView style={styles.container}>
                         <View style={styles.header}>

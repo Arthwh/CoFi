@@ -4,6 +4,7 @@ import { Ionicons, Feather } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { userService } from '../services/userService';
 import { authService } from '../services/authService';
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
 export default function ProfileScreen() {
         const [loading, setLoading] = useState(true);
@@ -71,11 +72,7 @@ export default function ProfileScreen() {
         const avatarLetter = name ? name.charAt(0).toUpperCase() : '?';
 
         if (loading) {
-                return (
-                        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                                <ActivityIndicator size="large" color={theme.colors.primary} />
-                        </View>
-                );
+                return <LoadingIndicator message="Carregando suas informações..." />;
         }
 
         return (

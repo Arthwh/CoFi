@@ -1,21 +1,30 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { theme } from '../theme'; // O "CSS" base do app
+import { theme } from '../theme';
 import { authService } from '../services/authService';
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
-// Recebemos a função onSwitch para trocar para a tela de cadastro
+// Recebe a função onSwitch para trocar para a tela de cadastro
 export default function LoginScreen({ onSwitch }: { onSwitch: () => void }) {
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
 
+        const [loading, setLoading] = useState(false);
+
         const handleLogin = async () => {
+                setLoading(true);
                 try {
                         await authService.login(email, password);
                         Alert.alert('Sucesso', 'Login realizado!');
                 } catch (error: any) {
                         Alert.alert('Erro', error.message);
                 }
+                setLoading(false);
         };
+
+        if (loading) {
+                return <LoadingIndicator />;
+        }
 
         return (
                 <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -51,7 +60,6 @@ export default function LoginScreen({ onSwitch }: { onSwitch: () => void }) {
         );
 }
 
-// O "CSS" exclusivo desta página
 const styles = StyleSheet.create({
         container: { flex: 1, backgroundColor: theme.colors.background },
         content: { flex: 1, justifyContent: 'center', padding: theme.spacing.xl, gap: theme.spacing.md },

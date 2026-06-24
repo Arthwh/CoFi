@@ -9,6 +9,7 @@ import { CreateTransactionPayload, transactionService } from '../services/transa
 import { userService } from '../services/userService';
 import { categoryService } from '../services/categoryService';
 import { paymentMethodService } from '../services/paymentMethodService';
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
 export default function AddTransactionScreen() {
         const [categories, setCategories] = useState<Category[]>([]);
@@ -43,6 +44,8 @@ export default function AddTransactionScreen() {
         // Controle de Modal
         const [modalVisible, setModalVisible] = useState(false);
 
+        const [loading, setLoading] = useState(true);
+
         useEffect(() => {
                 const fetchUserData = async () => {
                         const data = await userService.getUserProfile();
@@ -66,9 +69,11 @@ export default function AddTransactionScreen() {
                 };
 
                 fetchPaymentMethods();
+                setLoading(false);
         }, []);
 
         const handleSaveTransaction = async () => {
+                setLoading(true);
                 const [dia, mes, ano] = date.split('/');
                 const dataFormatada = `${ano}-${mes}-${dia}`;
 
@@ -97,6 +102,7 @@ export default function AddTransactionScreen() {
                         Alert.alert('Sucesso', 'Movimentação gravada com sucesso!');
                         resetForm();
                 } catch (e) { Alert.alert('Erro', 'Falha ao salvar'); }
+                setLoading(false);
         };
 
         const resetForm = () => {
@@ -116,6 +122,10 @@ export default function AddTransactionScreen() {
                 setNotifyMe(false);
                 setDaysBefore('1');
         };
+
+        if (loading) {
+                return <LoadingIndicator message="Salvando movimentação..." />;
+        }
 
         return (
                 <SafeAreaView style={styles.container}>
