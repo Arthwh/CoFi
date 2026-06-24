@@ -12,7 +12,6 @@ export default function ProfileScreen() {
         const [saving, setSaving] = useState(false);
         const [isEditing, setIsEditing] = useState(false);
 
-        // Estados dos dados
         const [id, setId] = useState('');
         const [name, setName] = useState('');
         const [phone, setPhone] = useState('');
@@ -27,10 +26,6 @@ export default function ProfileScreen() {
                         return () => { };
                 }, [])
         );
-
-        // useEffect(() => {
-        //         carregarDados();
-        // }, []);
 
         const carregarDados = async () => {
                 const profile = await userService.getUserProfile();

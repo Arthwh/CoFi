@@ -111,42 +111,6 @@ export default function AddTransactionScreen() {
                 }
         }, [transactionToEdit, isEditing]);
 
-        // // Verifica se algum campo foi editado
-        // useEffect(() => {
-        //         setContentWasEdited(true);
-        // }, [type, amount, description, selectedCategory, date, status, selectedPaymentMethod,
-        //         frequency, installmentsCount, payee, tags, ignoreInDashboard, notes, notifyMe, daysBeforeNotify]);
-
-        // useEffect(() => {
-        //         // Ouve o clique nas abas de baixo do aplicativo
-        //         const unsubscribeTab = navigation.getParent()?.addListener('tabPress' as any, (e: any) => {
-
-        //                 // Se o usuário alterou algo no formulário, impede a troca de aba
-        //                 if (contentWasEdited) {
-        //                         e.preventDefault(); // Trava o usuário na tela atual
-
-        //                         // Dispara o Alerta nativo (ou o seu modal customizado)
-        //                         Alert.alert(
-        //                                 'Descartar alterações?',
-        //                                 'Você perderá os dados digitados se sair agora.',
-        //                                 [
-        //                                         { text: 'Continuar Editando', style: 'cancel' },
-        //                                         {
-        //                                                 text: 'Descartar',
-        //                                                 style: 'destructive',
-        //                                                 onPress: () => {
-        //                                                         resetForm();
-        //                                                         navigation.navigate(e.target?.split('-')[0] as any);
-        //                                                 },
-        //                                         },
-        //                                 ]
-        //                         );
-        //                 }
-        //         });
-
-        //         return unsubscribeTab;
-        // }, [navigation]);
-
         const handleSaveTransaction = async () => {
                 if (!description || !amount) return;
 

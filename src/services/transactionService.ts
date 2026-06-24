@@ -21,6 +21,12 @@ export interface CreateTransactionPayload {
         days_before_notify?: number | null;
 }
 
+export interface BalanceData {
+        total: number;
+        income: number;
+        expense: number;
+}
+
 export const transactionService = {
         async create(payload: CreateTransactionPayload) {
                 const { data, error } = await supabase
@@ -77,6 +83,10 @@ export const transactionService = {
                 }
 
                 return data;
+        },
+
+        async getBalance() {
+                return { total: 0, income: 0, expense: 0 }
         },
 
         async markTransactionAsPaid(transactionId: string) {

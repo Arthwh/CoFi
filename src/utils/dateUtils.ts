@@ -50,5 +50,5 @@ export const dateUtils = {
                         monthName,
                         year
                 };
-        }
+        },
 }
