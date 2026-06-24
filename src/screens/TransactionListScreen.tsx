@@ -7,14 +7,17 @@ import { TransactionDetailsModal } from '../components/TransactionDetailsModal';
 import { transactionService } from '../services/transactionService';
 import { dateUtils, DateInfo } from '../utils/dateUtils'
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { useNavigation } from '@react-navigation/native';
 
 export default function TransactionsListScreen() {
+        const navigation = useNavigation();
+
         const [currentDateInfo, setCurrentDateInfo] = useState<DateInfo>(dateUtils.parseDateData());
         const [transactions, setTransactions] = useState<any[]>([]);
         const [activeFilter, setActiveFilter] = useState<FilterType>('all');
         const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
 
-        const [loadingScreen, setLoadingScreen] = useState(true);
+        const [loading, setLoading] = useState(true);
         const [isSavingTransaction, setIsSavingTransaction] = useState(false);
 
         const groupedTransactions = useMemo(() => {
@@ -57,7 +60,7 @@ export default function TransactionsListScreen() {
                         currentDateInfo.year
                 );
                 if (data) setTransactions(data);
-                setLoadingScreen(false);
+                setLoading(false);
         };
 
         // Funções para os botões de Avançar e Voltar Mês
@@ -87,7 +90,7 @@ export default function TransactionsListScreen() {
                 }
         }
 
-        if (loadingScreen) {
+        if (loading) {
                 return <LoadingIndicator message="Carregando suas movimentações..." />;
         }
 
@@ -162,6 +165,12 @@ export default function TransactionsListScreen() {
                                 onDelete={(id) => {
                                         console.log('Deletar ID:', id);
                                         setSelectedTransaction(null);
+                                }}
+                                onEdit={(transaction) => {
+                                        setSelectedTransaction(null);
+
+                                        // Redireciona para a tela de cadastro enviando os dados da movimentação
+                                        navigation.navigate('Adicionar', { transactionToEdit: transaction });
                                 }}
                                 isLoading={isSavingTransaction}
                         />

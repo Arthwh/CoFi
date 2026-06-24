@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
@@ -10,8 +10,19 @@ import { userService } from '../services/userService';
 import { categoryService } from '../services/categoryService';
 import { paymentMethodService } from '../services/paymentMethodService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import { RootStackParamList } from '../types/navigation';
 
 export default function AddTransactionScreen() {
+        const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
+        const navigation = useNavigation();
+
+        // Captura a movimentação vinda do Modal de Detalhes (se existir)
+        const transactionToEdit = route.params?.transactionToEdit;
+
+        const [isEditing, setIsEditing] = useState(false);
+        const [contentWasEdited, setContentWasEdited] = useState(false);
+
         const [categories, setCategories] = useState<Category[]>([]);
         const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
         const [userId, setUserId] = useState<string | null>(null);
@@ -38,7 +49,7 @@ export default function AddTransactionScreen() {
 
         // Funcionalidade de notificações
         const [notifyMe, setNotifyMe] = useState(false);
-        const [daysBefore, setDaysBefore] = useState('1'); // Quantos dias antes avisar
+        const [daysBeforeNotify, setDaysBeforeNotify] = useState('1'); // Quantos dias antes avisar
         const showNotificationOption = status === 'unpaid' || status === 'scheduled' || frequency === 'installment';
 
         // Controle de Modal
@@ -46,33 +57,99 @@ export default function AddTransactionScreen() {
 
         const [loading, setLoading] = useState(true);
 
+        useFocusEffect(
+                useCallback(() => {
+                        // Executado quando a tela entra em foco 
+                        return () => {
+                                // Executado quando a tela perde o foco
+                                resetForm();
+                        };
+                }, [])
+        );
+
         useEffect(() => {
-                const fetchUserData = async () => {
-                        const data = await userService.getUserProfile();
-                        console.log(data)
-                        if (data) setUserId(data.id)
-                }
+                const loadInitialData = async () => {
+                        try {
+                                const userData = await userService.getUserProfile();
+                                if (userData) setUserId(userData.id);
 
-                fetchUserData();
+                                const categoriesData = await categoryService.getCategories();
+                                if (categoriesData) setCategories(categoriesData);
 
-                const fetchCategories = async () => {
-                        const data = await categoryService.getCategories();
-                        if (data) setCategories(data);
+                                const paymentData = await paymentMethodService.getPaymentMethods();
+                                if (paymentData) setPaymentMethods(paymentData);
+                        } catch (e) {
+                                console.error(e);
+                        } finally {
+                                setLoading(false);
+                        }
                 };
 
-                fetchCategories();
-
-                const fetchPaymentMethods = async () => {
-                        const data = await paymentMethodService.getPaymentMethods();
-                        console.log(data)
-                        if (data) setPaymentMethods(data);
-                };
-
-                fetchPaymentMethods();
-                setLoading(false);
+                loadInitialData();
         }, []);
 
+        // Seta os dados no modo edição
+        useEffect(() => {
+                if (transactionToEdit && !isEditing) {
+                        setIsEditing(true);
+
+                        setDescription(transactionToEdit.description);
+                        setAmount(String(transactionToEdit.amount));
+                        setType(transactionToEdit.type);
+                        setSelectedCategory(transactionToEdit.category);
+                        setSelectedPaymentMethod(transactionToEdit.paymentMethod);
+                        setDate(transactionToEdit.date);
+                        setPayee(transactionToEdit.payee || '');
+                        setStatus(transactionToEdit.status);
+                        setFrequency(transactionToEdit.frequency)
+                        setInstallmentsCount(transactionToEdit.installmentsCount)
+                        setTags(transactionToEdit.tags)
+                        setIgnoreInDashboard(transactionToEdit.ignoreInDashboard)
+                        setNotes(transactionToEdit.notes)
+                        setNotifyMe(transactionToEdit.notifyMe)
+                        setDaysBeforeNotify(transactionToEdit.daysBeforeNotify)
+                }
+        }, [transactionToEdit, isEditing]);
+
+        // // Verifica se algum campo foi editado
+        // useEffect(() => {
+        //         setContentWasEdited(true);
+        // }, [type, amount, description, selectedCategory, date, status, selectedPaymentMethod,
+        //         frequency, installmentsCount, payee, tags, ignoreInDashboard, notes, notifyMe, daysBeforeNotify]);
+
+        // useEffect(() => {
+        //         // Ouve o clique nas abas de baixo do aplicativo
+        //         const unsubscribeTab = navigation.getParent()?.addListener('tabPress' as any, (e: any) => {
+
+        //                 // Se o usuário alterou algo no formulário, impede a troca de aba
+        //                 if (contentWasEdited) {
+        //                         e.preventDefault(); // Trava o usuário na tela atual
+
+        //                         // Dispara o Alerta nativo (ou o seu modal customizado)
+        //                         Alert.alert(
+        //                                 'Descartar alterações?',
+        //                                 'Você perderá os dados digitados se sair agora.',
+        //                                 [
+        //                                         { text: 'Continuar Editando', style: 'cancel' },
+        //                                         {
+        //                                                 text: 'Descartar',
+        //                                                 style: 'destructive',
+        //                                                 onPress: () => {
+        //                                                         resetForm();
+        //                                                         navigation.navigate(e.target?.split('-')[0] as any);
+        //                                                 },
+        //                                         },
+        //                                 ]
+        //                         );
+        //                 }
+        //         });
+
+        //         return unsubscribeTab;
+        // }, [navigation]);
+
         const handleSaveTransaction = async () => {
+                if (!description || !amount) return;
+
                 setLoading(true);
                 const [dia, mes, ano] = date.split('/');
                 const dataFormatada = `${ano}-${mes}-${dia}`;
@@ -93,16 +170,26 @@ export default function AddTransactionScreen() {
                         ignore_in_dashboard: ignoreInDashboard,
                         notes,
                         notify_me: notifyMe,
-                        days_before_notify: notifyMe === true ? parseInt(daysBefore) : null
+                        days_before_notify: notifyMe === true ? parseInt(daysBeforeNotify) : null
                 };
-                console.log('Salvando movimentação:', payload);
 
                 try {
-                        await transactionService.create(payload);
-                        Alert.alert('Sucesso', 'Movimentação gravada com sucesso!');
+                        if (isEditing) {
+                                await transactionService.update(transactionToEdit.id, payload)
+                                Alert.alert('Sucesso', 'Movimentação atualizada com sucesso!');
+                                // Volta para a tela anterior
+                                navigation.goBack();
+                        }
+                        else {
+                                await transactionService.create(payload);
+                                Alert.alert('Sucesso', 'Movimentação salva com sucesso!');
+                        }
+                } catch (e) {
+                        Alert.alert('Erro', 'Erro ao salvar');
+                } finally {
                         resetForm();
-                } catch (e) { Alert.alert('Erro', 'Falha ao salvar'); }
-                setLoading(false);
+                        setLoading(false);
+                }
         };
 
         const resetForm = () => {
@@ -120,7 +207,10 @@ export default function AddTransactionScreen() {
                 setIgnoreInDashboard(false);
                 setNotes('');
                 setNotifyMe(false);
-                setDaysBefore('1');
+                setDaysBeforeNotify('1');
+
+                setIsEditing(false)
+                navigation.setParams({ transactionToEdit: undefined });
         };
 
         if (loading) {
@@ -131,7 +221,7 @@ export default function AddTransactionScreen() {
                 <SafeAreaView style={styles.container}>
                         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                                <Text style={styles.headerTitle}>Nova Movimentação</Text>
+                                <Text style={styles.headerTitle}>{isEditing ? 'Editar Movimentação' : 'Nova Movimentação'}</Text>
 
                                 {/* Seletor de Tipo de Movimentação */}
                                 <View style={styles.typeSelectorRow}>
@@ -184,16 +274,16 @@ export default function AddTransactionScreen() {
                                                 </View>
 
                                                 {notifyMe && (
-                                                        <View style={styles.daysBeforeContainer}>
-                                                                <Text style={styles.daysBeforeLabel}>Avisar quantos dias antes?</Text>
+                                                        <View style={styles.daysBeforeNotifyContainer}>
+                                                                <Text style={styles.daysBeforeNotifyLabel}>Avisar quantos dias antes?</Text>
                                                                 <View style={styles.daysRow}>
                                                                         {['1', '3', '5'].map((day) => (
                                                                                 <TouchableOpacity
                                                                                         key={day}
-                                                                                        style={[styles.dayChip, daysBefore === day && styles.dayChipActive]}
-                                                                                        onPress={() => setDaysBefore(day)}
+                                                                                        style={[styles.dayChip, daysBeforeNotify === day && styles.dayChipActive]}
+                                                                                        onPress={() => setDaysBeforeNotify(day)}
                                                                                 >
-                                                                                        <Text style={[styles.dayChipText, daysBefore === day && styles.textWhite]}>{day} {day === '1' ? 'dia' : 'dias'}</Text>
+                                                                                        <Text style={[styles.dayChipText, daysBeforeNotify === day && styles.textWhite]}>{day} {day === '1' ? 'dia' : 'dias'}</Text>
                                                                                 </TouchableOpacity>
                                                                         ))}
                                                                 </View>
@@ -287,7 +377,7 @@ export default function AddTransactionScreen() {
                                 </View>
 
                                 <TouchableOpacity style={[styles.submitButton, styles.shadow]} onPress={handleSaveTransaction}>
-                                        <Text style={styles.submitButtonText}>Confirmar Lançamento</Text>
+                                        <Text style={styles.submitButtonText}>{isEditing ? 'Salvar Alterações' : 'Confirmar Movimentação'}</Text>
                                 </TouchableOpacity>
 
                         </ScrollView>
@@ -362,8 +452,8 @@ const styles = StyleSheet.create({
 
         // Estilos do Card de Notificação
         notificationIconBg: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#3B82F615', justifyContent: 'center', alignItems: 'center' },
-        daysBeforeContainer: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' },
-        daysBeforeLabel: { fontSize: 13, fontWeight: '600', color: theme.colors.text, marginBottom: 10 },
+        daysBeforeNotifyContainer: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' },
+        daysBeforeNotifyLabel: { fontSize: 13, fontWeight: '600', color: theme.colors.text, marginBottom: 10 },
         daysRow: { flexDirection: 'row', gap: 8 },
         dayChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: theme.colors.background, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' },
         dayChipActive: { backgroundColor: '#3B82F6', borderColor: '#3B82F6' },

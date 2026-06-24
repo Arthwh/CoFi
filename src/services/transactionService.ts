@@ -97,5 +97,33 @@ export const transactionService = {
                 }
 
                 return data ? data[0] : null;
+        },
+
+        async update(transactionId: string, payload: CreateTransactionPayload) {
+                const { data, error } = await supabase
+                        .from('transactions')
+                        .update({
+                                description: payload.description,
+                                amount: payload.amount,
+                                category_id: payload.category_id,
+                                payment_method_id: payload.payment_method_id,
+                                status: payload.status,
+                                payee: payload.payee,
+                                tags: payload.tags,
+                                ignore_in_dashboard: payload.ignore_in_dashboard,
+                                notes: payload.notes,
+                                notify_me: payload.notify_me,
+                                days_before_notify: payload.days_before_notify,
+                                updated_at: new Date().toISOString() // Registra o momento da alteração
+                        })
+                        .eq('id', transactionId)
+                        .select();
+
+                if (error) {
+                        console.error('Erro ao atualizar movimentação:', error.message);
+                        throw error;
+                }
+
+                return data ? data[0] : null;
         }
 };

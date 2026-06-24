@@ -8,10 +8,11 @@ interface TransactionDetailsModalProps {
         onClose: () => void;
         onMarkAsPaid: (id: string) => void;
         onDelete?: (id: string) => void;
+        onEdit: (transaction: any) => void;
         isLoading?: boolean;
 }
 
-export function TransactionDetailsModal({ visible, transaction, onClose, onMarkAsPaid, onDelete, isLoading = false }: TransactionDetailsModalProps) {
+export function TransactionDetailsModal({ visible, transaction, onClose, onMarkAsPaid, onDelete, onEdit, isLoading = false }: TransactionDetailsModalProps) {
         if (!transaction) return null;
 
         const isIncome = transaction.type === 'income';
@@ -71,7 +72,7 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                                 )}
 
                                                 <View style={styles.rowActions}>
-                                                        <TouchableOpacity style={styles.btnSecondary} disabled={isLoading}>
+                                                        <TouchableOpacity style={styles.btnSecondary} disabled={isLoading} onPress={() => onEdit(transaction)}>
                                                                 <Ionicons name="pencil" size={20} color={theme.colors.textLight} />
                                                                 <Text style={styles.btnSecondaryText}>Editar</Text>
                                                         </TouchableOpacity>
