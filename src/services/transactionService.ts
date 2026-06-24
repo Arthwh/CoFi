@@ -68,7 +68,7 @@ export const transactionService = {
                                 paymentMethod:payment_methods!inner(id, name, icon, color)
                         `)
                         .gte('date', firstDay)
-                        .lte('date', lastDay) 
+                        .lte('date', lastDay)
                         .order('date', { ascending: false }); // Ordena da mais recente para a mais antiga
 
                 if (error) {
@@ -77,5 +77,25 @@ export const transactionService = {
                 }
 
                 return data;
+        },
+
+        async markTransactionAsPaid(transactionId: string) {
+                const { data, error } = await supabase
+                        .from('transactions')
+                        .update({
+                                status: 'paid',
+                                updated_at: new Date().toISOString(),
+                                notify_me: false,
+                                days_before_notify: null
+                        })
+                        .eq('id', transactionId)
+                        .select();
+
+                if (error) {
+                        console.error('Erro ao marcar transação como paga:', error.message);
+                        throw error;
+                }
+
+                return data ? data[0] : null;
         }
 };

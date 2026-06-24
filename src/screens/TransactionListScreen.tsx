@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { TransactionFilters, FilterType } from '../components/TransactionFilters';
@@ -14,7 +14,8 @@ export default function TransactionsListScreen() {
         const [activeFilter, setActiveFilter] = useState<FilterType>('all');
         const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
 
-        const [loading, setLoading] = useState(true);
+        const [loadingScreen, setLoadingScreen] = useState(true);
+        const [isSavingTransaction, setIsSavingTransaction] = useState(false);
 
         const groupedTransactions = useMemo(() => {
                 // Se não tem transação, devolve array vazio
@@ -46,18 +47,18 @@ export default function TransactionsListScreen() {
         }, [activeFilter, transactions]);
 
         useEffect(() => {
-                const fetchTransactions = async () => {
-                        // Passa o número do mês e o ano extraídos do objeto
-                        const data = await transactionService.getTransactionsByMonth(
-                                currentDateInfo.monthNumber,
-                                currentDateInfo.year
-                        );
-                        if (data) setTransactions(data);
-                        setLoading(false);
-                };
-
                 fetchTransactions();
         }, [currentDateInfo.monthNumber, currentDateInfo.year]);
+
+        const fetchTransactions = async () => {
+                // Passa o número do mês e o ano extraídos do objeto
+                const data = await transactionService.getTransactionsByMonth(
+                        currentDateInfo.monthNumber,
+                        currentDateInfo.year
+                );
+                if (data) setTransactions(data);
+                setLoadingScreen(false);
+        };
 
         // Funções para os botões de Avançar e Voltar Mês
         const handlePreviousMonth = () => {
@@ -70,10 +71,26 @@ export default function TransactionsListScreen() {
                 setCurrentDateInfo(dateUtils.parseDateData(nextDate));
         };
 
-        if (loading) {
+        const handleMarkTransactionAsPaid = async (transactionId: string) => {
+                try {
+                        setIsSavingTransaction(true);
+                        await transactionService.markTransactionAsPaid(transactionId);
+
+                        fetchTransactions();
+
+                        setSelectedTransaction(null);
+                } catch (error) {
+                        Alert.alert("Erro", "Não foi possível atualizar a movimentação")
+                        console.error(error);
+                } finally {
+                        setIsSavingTransaction(false);
+                }
+        }
+
+        if (loadingScreen) {
                 return <LoadingIndicator message="Carregando suas movimentações..." />;
         }
-        
+
         return (
                 <SafeAreaView style={styles.container}>
                         <View style={styles.header}>
@@ -139,14 +156,14 @@ export default function TransactionsListScreen() {
                                 visible={!!selectedTransaction}
                                 transaction={selectedTransaction}
                                 onClose={() => setSelectedTransaction(null)}
-                                onMarkAsPaid={(id) => {
-                                        console.log('Pagar ID:', id);
-                                        setSelectedTransaction(null); // Fecha modal
+                                onMarkAsPaid={async (id) => {
+                                        await handleMarkTransactionAsPaid(id)
                                 }}
                                 onDelete={(id) => {
                                         console.log('Deletar ID:', id);
                                         setSelectedTransaction(null);
                                 }}
+                                isLoading={isSavingTransaction}
                         />
                 </SafeAreaView>
         );

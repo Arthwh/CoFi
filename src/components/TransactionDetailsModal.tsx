@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 
@@ -6,11 +6,12 @@ interface TransactionDetailsModalProps {
         visible: boolean;
         transaction: any | null;
         onClose: () => void;
-        onMarkAsPaid?: (id: string) => void;
+        onMarkAsPaid: (id: string) => void;
         onDelete?: (id: string) => void;
+        isLoading?: boolean;
 }
 
-export function TransactionDetailsModal({ visible, transaction, onClose, onMarkAsPaid, onDelete }: TransactionDetailsModalProps) {
+export function TransactionDetailsModal({ visible, transaction, onClose, onMarkAsPaid, onDelete, isLoading = false }: TransactionDetailsModalProps) {
         if (!transaction) return null;
 
         const isIncome = transaction.type === 'income';
@@ -22,7 +23,7 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                 <SafeAreaView style={styles.modalContent}>
                                         <View style={styles.dragIndicator} />
 
-                                        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                                        <TouchableOpacity style={styles.closeButton} onPress={onClose} disabled={isLoading}>
                                                 <Ionicons name="close" size={24} color={theme.colors.textLight} />
                                         </TouchableOpacity>
 
@@ -57,25 +58,31 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                         {/* Ações */}
                                         <View style={styles.actionsContainer}>
                                                 {isUnpaid && (
-                                                        <TouchableOpacity style={styles.btnPrimary} onPress={() => onMarkAsPaid?.(transaction.id)}>
-                                                                <Ionicons name="checkmark-circle" size={20} color="#FFF" />
-                                                                <Text style={styles.btnPrimaryText}>Marcar como Pago</Text>
+                                                        <TouchableOpacity style={styles.btnPrimary} onPress={() => onMarkAsPaid(transaction.id)} disabled={isLoading}>
+                                                                {isLoading ? (
+                                                                        <ActivityIndicator size="small" color="#FFF" />
+                                                                ) : (
+                                                                        <>
+                                                                                <Ionicons name="checkmark-circle" size={20} color="#FFF" />
+                                                                                <Text style={styles.btnPrimaryText}>Marcar como Pago</Text>
+                                                                        </>
+                                                                )}
                                                         </TouchableOpacity>
                                                 )}
 
                                                 <View style={styles.rowActions}>
-                                                        <TouchableOpacity style={styles.btnSecondary}>
+                                                        <TouchableOpacity style={styles.btnSecondary} disabled={isLoading}>
                                                                 <Ionicons name="pencil" size={20} color={theme.colors.textLight} />
                                                                 <Text style={styles.btnSecondaryText}>Editar</Text>
                                                         </TouchableOpacity>
-                                                        <TouchableOpacity style={[styles.btnSecondary, styles.btnDanger]} onPress={() => onDelete?.(transaction.id)}>
+                                                        <TouchableOpacity style={[styles.btnSecondary, styles.btnDanger]} onPress={() => onDelete?.(transaction.id)} disabled={isLoading}>
                                                                 <Ionicons name="trash" size={20} color="#EF4444" />
                                                         </TouchableOpacity>
                                                 </View>
                                         </View>
                                 </SafeAreaView>
-                        </View>
-                </Modal>
+                        </View >
+                </Modal >
         );
 }
 
