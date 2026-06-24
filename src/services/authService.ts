@@ -6,6 +6,11 @@ export const authService = {
                         email,
                         password,
                 });
+                if (data.user?.deleted_at) {
+                        await this.signOut();
+                        throw "Conta do usuário está inativa."
+                }
+
                 if (error) throw error;
                 return data;
         },

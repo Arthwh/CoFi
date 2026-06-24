@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { theme } from '../theme';
@@ -12,6 +12,7 @@ export default function ProfileScreen() {
         const [isEditing, setIsEditing] = useState(false);
 
         // Estados dos dados
+        const [id, setId] = useState('');
         const [name, setName] = useState('');
         const [phone, setPhone] = useState('');
         const [cpf, setCpf] = useState('');
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
                 const profile = await userService.getUserProfile();
                 console.log(profile)
                 if (profile) {
+                        setId(profile.id);
                         setName(profile.name);
                         setPhone(profile.phone);
                         setCpf(profile.cpf);
@@ -67,6 +69,19 @@ export default function ProfileScreen() {
                         }
                 ]);
         };
+
+        const handleDelete = () => {
+                Alert.alert('Deletar', 'Tem certeza que deseja deletar a conta?', [
+                        { text: 'Cancelar', style: 'cancel' },
+                        {
+                                text: 'Deletar',
+                                style: 'destructive',
+                                onPress: async () => {
+                                        await userService.deleteUserProfile(id);
+                                }
+                        }
+                ]);
+        }
 
         // Pega a primeira letra do nome para o Avatar
         const avatarLetter = name ? name.charAt(0).toUpperCase() : '?';
@@ -163,9 +178,15 @@ export default function ProfileScreen() {
                                 </View>
 
                                 {/* Botão de Sair */}
-                                <TouchableOpacity style={[styles.logoutButton, styles.shadow]} onPress={handleLogout}>
+                                <TouchableOpacity style={[styles.button, styles.logoutButton, styles.shadow]} onPress={handleLogout}>
                                         <Ionicons name="log-out-outline" size={24} color={theme.colors.danger} />
-                                        <Text style={styles.logoutText}>Sair da conta</Text>
+                                        <Text style={[styles.buttonText, styles.logoutText]}>Sair da conta</Text>
+                                </TouchableOpacity>
+
+                                {/* Botão de Sair */}
+                                <TouchableOpacity style={[styles.button, styles.deleteButton, styles.shadow]} onPress={handleDelete}>
+                                        <Ionicons name="trash" size={24} color={theme.colors.white} />
+                                        <Text style={[styles.buttonText, styles.deleteText]}>Deletar conta</Text>
                                 </TouchableOpacity>
 
                         </ScrollView>
@@ -216,7 +237,13 @@ const styles = StyleSheet.create({
         iconContainer: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(99, 102, 241, 0.1)', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
         menuItemText: { fontSize: 16, fontWeight: '500', color: theme.colors.text },
 
+        button: { flexDirection: 'row', borderRadius: 20, padding: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1 },
+        buttonText: { marginLeft: 12, fontSize: 18, fontWeight: 'bold' },
+
         // Logout
-        logoutButton: { flexDirection: 'row', backgroundColor: theme.colors.surface, borderRadius: 20, padding: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(239, 68, 68, 0.3)' },
-        logoutText: { marginLeft: 12, fontSize: 18, fontWeight: 'bold', color: theme.colors.danger },
+        logoutButton: { backgroundColor: theme.colors.surface, borderColor: theme.colors.danger },
+        logoutText: { color: theme.colors.danger },
+
+        deleteButton: { backgroundColor: theme.colors.danger, borderColor: theme.colors.white, marginTop: 10 },
+        deleteText: { color: theme.colors.white },
 });

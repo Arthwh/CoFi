@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { authService } from './authService';
 
 export const userService = {
         async getUserProfile() {
@@ -31,6 +32,23 @@ export const userService = {
                         console.error('Erro ao atualizar perfil:', error.message);
                         throw error;
                 }
+
+                return data.user;
+        },
+
+        async deleteUserProfile(userId: string) {
+                const { data, error } = await supabase.auth.updateUser({
+                        data: {
+                                deleted_at: true
+                        }
+                });
+
+                if (error) {
+                        console.error('Erro ao deletar perfil:', error.message);
+                        throw error;
+                }
+
+                await authService.signOut()
 
                 return data.user;
         }

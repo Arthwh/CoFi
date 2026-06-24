@@ -4,7 +4,8 @@ import { theme } from '../theme';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddTransactionScreen from '../screens/AddTransactionScreen';
-import TransactionsListScreen from '../screens/TransactionListScreen'
+import TransactionsListScreen from '../screens/TransactionListScreen';
+import DashboardScreen from '../screens/DashboardScreen';
 import { CustomAddButton } from '../components/CustomAddButton';
 
 const Tab = createBottomTabNavigator();
@@ -64,7 +65,7 @@ export default function AppRoutes() {
 
                         <Tab.Screen
                                 name="Dashboard"
-                                component={HomeScreen}
+                                component={DashboardScreen}
                                 options={{
                                         tabBarIcon: ({ color }) => <Entypo name="bar-graph" color={color} size={26} />
                                 }}

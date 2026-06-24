@@ -8,6 +8,7 @@ export const theme = {
     success: '#22C55E',    // Verde para entradas de dinheiro
     danger: '#EF4444',     // Vermelho para saídas de dinheiro
     border: '#E5E7EB',     // Cor das bordas dos inputs
+    white: '#FFFFFF',
   },
   spacing: {
     sm: 8,
