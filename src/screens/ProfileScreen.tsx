@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { userService } from '../services/userService';
 import { authService } from '../services/authService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ProfileScreen() {
         const [loading, setLoading] = useState(true);
@@ -19,9 +20,17 @@ export default function ProfileScreen() {
         const [email, setEmail] = useState('');
         const [createdAt, setCreatedAt] = useState('');
 
-        useEffect(() => {
-                carregarDados();
-        }, []);
+        useFocusEffect(
+                useCallback(() => {
+                        carregarDados();
+                        // Executado quando a tela entra em foco 
+                        return () => { };
+                }, [])
+        );
+
+        // useEffect(() => {
+        //         carregarDados();
+        // }, []);
 
         const carregarDados = async () => {
                 const profile = await userService.getUserProfile();
@@ -87,7 +96,7 @@ export default function ProfileScreen() {
         const avatarLetter = name ? name.charAt(0).toUpperCase() : '?';
 
         if (loading) {
-                return <LoadingIndicator message="Carregando suas informações..." />;
+                return <LoadingIndicator message="Carregando..." />;
         }
 
         return (

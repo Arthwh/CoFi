@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList, ActivityIndicator, Alert } from 'react-native';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { TransactionFilters, FilterType } from '../components/TransactionFilters';
@@ -7,7 +7,7 @@ import { TransactionDetailsModal } from '../components/TransactionDetailsModal';
 import { transactionService } from '../services/transactionService';
 import { dateUtils, DateInfo } from '../utils/dateUtils'
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 export default function TransactionsListScreen() {
         const navigation = useNavigation();
@@ -19,6 +19,14 @@ export default function TransactionsListScreen() {
 
         const [loading, setLoading] = useState(true);
         const [isSavingTransaction, setIsSavingTransaction] = useState(false);
+
+        useFocusEffect(
+                useCallback(() => {
+                        fetchTransactions();
+                        // Executado quando a tela entra em foco 
+                        return () => { };
+                }, [])
+        );
 
         const groupedTransactions = useMemo(() => {
                 // Se não tem transação, devolve array vazio
@@ -91,7 +99,7 @@ export default function TransactionsListScreen() {
         }
 
         if (loading) {
-                return <LoadingIndicator message="Carregando suas movimentações..." />;
+                return <LoadingIndicator message="Carregando..." />;
         }
 
         return (

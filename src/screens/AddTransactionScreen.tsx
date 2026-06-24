@@ -27,7 +27,7 @@ export default function AddTransactionScreen() {
         const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
         const [userId, setUserId] = useState<string | null>(null);
         // Dados Principais
-        const [type, setType] = useState<'income' | 'expense'>('expense');
+        const [type, setType] = useState<'income' | 'expense'>('income');
         const [amount, setAmount] = useState('');
         const [description, setDescription] = useState('');
         const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -214,7 +214,7 @@ export default function AddTransactionScreen() {
         };
 
         if (loading) {
-                return <LoadingIndicator message="Salvando movimentação..." />;
+                return <LoadingIndicator message="Carregando..." />;
         }
 
         return (
