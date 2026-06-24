@@ -1,15 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { TransactionFilters, FilterType } from '../components/TransactionFilters';
 import { TransactionDetailsModal } from '../components/TransactionDetailsModal';
 import { transactionService } from '../services/transactionService';
+import { dateUtils, DateInfo } from '../utils/dateUtils'
 
 export default function TransactionsListScreen() {
+        const [currentDateInfo, setCurrentDateInfo] = useState<DateInfo>(dateUtils.parseDateData());
         const [transactions, setTransactions] = useState<any[]>([]);
         const [activeFilter, setActiveFilter] = useState<FilterType>('all');
         const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+
+        const [loading, setLoading] = useState(true);
 
         const groupedTransactions = useMemo(() => {
                 // Se não tem transação, devolve array vazio
@@ -42,21 +46,44 @@ export default function TransactionsListScreen() {
 
         useEffect(() => {
                 const fetchTransactions = async () => {
-                        const data = await transactionService.getTransactions();
-                        console.log(data)
-                        if (data) setTransactions(data)
-                }
+                        // Passa o número do mês e o ano extraídos do objeto
+                        const data = await transactionService.getTransactionsByMonth(
+                                currentDateInfo.monthNumber,
+                                currentDateInfo.year
+                        );
+                        if (data) setTransactions(data);
+                        setLoading(false);
+                };
 
                 fetchTransactions();
-        }, []);
+        }, [currentDateInfo.monthNumber, currentDateInfo.year]);
+
+        // Funções para os botões de Avançar e Voltar Mês
+        const handlePreviousMonth = () => {
+                const prevDate = new Date(currentDateInfo.year, currentDateInfo.monthNumber - 2, 1);
+                setCurrentDateInfo(dateUtils.parseDateData(prevDate));
+        };
+
+        const handleNextMonth = () => {
+                const nextDate = new Date(currentDateInfo.year, currentDateInfo.monthNumber, 1);
+                setCurrentDateInfo(dateUtils.parseDateData(nextDate));
+        };
+
+        if (loading) {
+                return (
+                        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                                <ActivityIndicator size="large" color={theme.colors.primary} />
+                        </View>
+                );
+        }
 
         return (
                 <SafeAreaView style={styles.container}>
                         <View style={styles.header}>
                                 <View style={styles.monthSelector}>
-                                        <TouchableOpacity><Ionicons name="chevron-back" size={24} color={theme.colors.text} /></TouchableOpacity>
-                                        <Text style={styles.monthText}>Junho 2026</Text>
-                                        <TouchableOpacity><Ionicons name="chevron-forward" size={24} color={theme.colors.text} /></TouchableOpacity>
+                                        <TouchableOpacity onPress={handlePreviousMonth}><Ionicons name="chevron-back" size={24} color={theme.colors.text} /></TouchableOpacity>
+                                        <Text style={styles.monthText}>{currentDateInfo.monthName} {currentDateInfo.year}</Text>
+                                        <TouchableOpacity onPress={handleNextMonth}><Ionicons name="chevron-forward" size={24} color={theme.colors.text} /></TouchableOpacity>
                                 </View>
                         </View>
 
@@ -111,7 +138,6 @@ export default function TransactionsListScreen() {
                                 />
                         </View>
 
-                        {/* Modal é montado no final da tela */}
                         <TransactionDetailsModal
                                 visible={!!selectedTransaction}
                                 transaction={selectedTransaction}

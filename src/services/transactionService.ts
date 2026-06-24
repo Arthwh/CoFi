@@ -52,5 +52,30 @@ export const transactionService = {
                 }
 
                 return data;
+        },
+
+        async getTransactionsByMonth(month: number, year: number) {
+                // Descobre o primeiro e o último dia do mês desejado
+                const firstDay = `${year}-${String(month).padStart(2, '0')}-01`;
+                const lastDayOfMonth = new Date(year, month, 0).getDate();
+                const lastDay = `${year}-${String(month).padStart(2, '0')}-${lastDayOfMonth}`;
+
+                const { data, error } = await supabase
+                        .from('transactions')
+                        .select(`
+                                *,
+                                category:categories!inner(id, name, icon, color),
+                                paymentMethod:payment_methods!inner(id, name, icon, color)
+                        `)
+                        .gte('date', firstDay)
+                        .lte('date', lastDay) 
+                        .order('date', { ascending: false }); // Ordena da mais recente para a mais antiga
+
+                if (error) {
+                        console.error('Erro ao obter transações:', error.message);
+                        throw error;
+                }
+
+                return data;
         }
 };
