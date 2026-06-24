@@ -1,5 +1,4 @@
 import { supabase } from '../lib/supabase';
-import { PaymentMethod } from '../components/PaymentMethodPicker';
 import { TransactionStatus } from '../components/TransactionStatusPicker';
 
 // Interface do Payload de cadastro
@@ -54,7 +53,7 @@ export const transactionService = {
                 return data;
         },
 
-        async getTransactionsByMonth(month: number, year: number) {
+        async getActiveTransactionsByMonth(month: number, year: number) {
                 // Descobre o primeiro e o último dia do mês desejado
                 const firstDay = `${year}-${String(month).padStart(2, '0')}-01`;
                 const lastDayOfMonth = new Date(year, month, 0).getDate();
@@ -67,6 +66,7 @@ export const transactionService = {
                                 category:categories!inner(id, name, icon, color),
                                 paymentMethod:payment_methods!inner(id, name, icon, color)
                         `)
+                        .is('deleted_at', null)
                         .gte('date', firstDay)
                         .lte('date', lastDay)
                         .order('date', { ascending: false }); // Ordena da mais recente para a mais antiga
@@ -125,5 +125,22 @@ export const transactionService = {
                 }
 
                 return data ? data[0] : null;
+        },
+
+        async delete(transactionId: string) {
+                const { error } = await supabase
+                        .from('transactions')
+                        .update({
+                                updated_at: new Date().toISOString(),
+                                deleted_at: new Date().toISOString()
+                        })
+                        .eq('id', transactionId)
+
+                if (error) {
+                        console.error('Erro ao deletar movimentação:', error.message);
+                        throw error;
+                }
+
+                return null;
         }
 };

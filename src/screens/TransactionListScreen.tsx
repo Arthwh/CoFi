@@ -63,7 +63,7 @@ export default function TransactionsListScreen() {
 
         const fetchTransactions = async () => {
                 // Passa o número do mês e o ano extraídos do objeto
-                const data = await transactionService.getTransactionsByMonth(
+                const data = await transactionService.getActiveTransactionsByMonth(
                         currentDateInfo.monthNumber,
                         currentDateInfo.year
                 );
@@ -95,6 +95,29 @@ export default function TransactionsListScreen() {
                         console.error(error);
                 } finally {
                         setIsSavingTransaction(false);
+                }
+        }
+
+        const handleDeleteTransaction = (transactionId: string) => {
+                try {
+                        Alert.alert(
+                                'Deseja deletar a movimentação?',
+                                'Esta ação não pode ser desfeita',
+                                [
+                                        { text: 'Cancelar', style: 'cancel' },
+                                        {
+                                                text: 'Deletar',
+                                                style: 'destructive',
+                                                onPress: async () => {
+                                                        await transactionService.delete(transactionId);
+                                                        fetchTransactions();
+                                                },
+                                        },
+                                ]
+                        );
+                } catch (error) {
+                        Alert.alert("Erro", "Não foi possível deletar a movimentação")
+                        console.error(error);
                 }
         }
 
@@ -171,7 +194,7 @@ export default function TransactionsListScreen() {
                                         await handleMarkTransactionAsPaid(id)
                                 }}
                                 onDelete={(id) => {
-                                        console.log('Deletar ID:', id);
+                                        handleDeleteTransaction(id);
                                         setSelectedTransaction(null);
                                 }}
                                 onEdit={(transaction) => {

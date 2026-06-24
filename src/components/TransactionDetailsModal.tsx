@@ -7,7 +7,7 @@ interface TransactionDetailsModalProps {
         transaction: any | null;
         onClose: () => void;
         onMarkAsPaid: (id: string) => void;
-        onDelete?: (id: string) => void;
+        onDelete: (id: string) => void;
         onEdit: (transaction: any) => void;
         isLoading?: boolean;
 }
@@ -76,7 +76,7 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                                                 <Ionicons name="pencil" size={20} color={theme.colors.textLight} />
                                                                 <Text style={styles.btnSecondaryText}>Editar</Text>
                                                         </TouchableOpacity>
-                                                        <TouchableOpacity style={[styles.btnSecondary, styles.btnDanger]} onPress={() => onDelete?.(transaction.id)} disabled={isLoading}>
+                                                        <TouchableOpacity style={[styles.btnSecondary, styles.btnDanger]} onPress={() => onDelete(transaction.id)} disabled={isLoading}>
                                                                 <Ionicons name="trash" size={20} color="#EF4444" />
                                                         </TouchableOpacity>
                                                 </View>
