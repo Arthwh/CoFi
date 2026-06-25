@@ -34,11 +34,11 @@ export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
                         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
                                 <Text style={styles.title}>Criar Conta</Text>
 
-                                <TextInput style={styles.input} placeholder="Nome Completo" value={nome} onChangeText={setNome} />
-                                <TextInput style={styles.input} placeholder="CPF (números)" keyboardType="numeric" value={cpf} onChangeText={setCpf} />
-                                <TextInput style={styles.input} placeholder="Telefone (xx) xxxxx-xxxx" keyboardType="numeric" value={telefone} onChangeText={setTelefone} />
-                                <TextInput style={styles.input} placeholder="E-mail" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
-                                <TextInput style={styles.input} placeholder="Senha" secureTextEntry value={password} onChangeText={setPassword} />
+                                <TextInput style={styles.input} placeholder="Nome Completo" placeholderTextColor={theme.colors.placeholder} value={nome} onChangeText={setNome} />
+                                <TextInput style={styles.input} placeholder="CPF (números)" placeholderTextColor={theme.colors.placeholder} keyboardType="numeric" value={cpf} onChangeText={setCpf} />
+                                <TextInput style={styles.input} placeholder="Telefone (xx) xxxxx-xxxx" placeholderTextColor={theme.colors.placeholder} keyboardType="numeric" value={telefone} onChangeText={setTelefone} />
+                                <TextInput style={styles.input} placeholder="E-mail" placeholderTextColor={theme.colors.placeholder} keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+                                <TextInput style={styles.input} placeholder="Senha" placeholderTextColor={theme.colors.placeholder} secureTextEntry value={password} onChangeText={setPassword} />
 
                                 <TouchableOpacity style={styles.button} onPress={handleRegister}>
                                         <Text style={styles.buttonText}>Cadastrar</Text>

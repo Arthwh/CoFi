@@ -8,8 +8,6 @@ import TransactionsListScreen from '../screens/TransactionListScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import { CustomAddButton } from '../components/CustomAddButton';
 
-import { RootStackParamList } from '../types/navigation';
-
 const Tab = createBottomTabNavigator();
 
 export default function AppRoutes() {

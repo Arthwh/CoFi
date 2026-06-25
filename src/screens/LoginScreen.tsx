@@ -35,6 +35,7 @@ export default function LoginScreen({ onSwitch }: { onSwitch: () => void }) {
                                 <TextInput
                                         style={styles.input}
                                         placeholder="E-mail"
+                                        placeholderTextColor={theme.colors.placeholder}
                                         keyboardType="email-address"
                                         autoCapitalize="none"
                                         value={email}
@@ -43,6 +44,7 @@ export default function LoginScreen({ onSwitch }: { onSwitch: () => void }) {
                                 <TextInput
                                         style={styles.input}
                                         placeholder="Senha"
+                                        placeholderTextColor={theme.colors.placeholder}
                                         secureTextEntry
                                         value={password}
                                         onChangeText={setPassword}

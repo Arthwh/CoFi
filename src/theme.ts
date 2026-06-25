@@ -9,6 +9,7 @@ export const theme = {
     danger: '#EF4444',     // Vermelho para saídas de dinheiro
     border: '#E5E7EB',     // Cor das bordas dos inputs
     white: '#FFFFFF',
+    placeholder: '#94A3B8',
   },
   spacing: {
     sm: 8,

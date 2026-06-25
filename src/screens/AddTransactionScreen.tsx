@@ -211,7 +211,7 @@ export default function AddTransactionScreen() {
                                         <Text style={styles.inputLabelLabel}>Valor da Transação</Text>
                                         <View style={styles.amountInputContainer}>
                                                 <Text style={styles.currencyPrefix}>R$</Text>
-                                                <TextInput style={styles.amountInput} placeholder="0,00" keyboardType="numeric" value={amount} onChangeText={setAmount} />
+                                                <TextInput style={styles.amountInput} placeholder="0,00" placeholderTextColor={theme.colors.placeholder} keyboardType="numeric" value={amount} onChangeText={setAmount} />
                                         </View>
 
                                         <TransactionStatusPicker status={status} onChange={setStatus} isExpense={type === 'expense'} />
@@ -260,7 +260,7 @@ export default function AddTransactionScreen() {
                                 <View style={[styles.card, styles.shadow]}>
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Descrição</Text>
-                                                <TextInput style={styles.input} placeholder="Ex: Supermercado" value={description} onChangeText={setDescription} />
+                                                <TextInput style={styles.input} placeholder="Ex: Supermercado" placeholderTextColor={theme.colors.placeholder} value={description} onChangeText={setDescription} />
                                         </View>
                                         <View style={styles.divider} />
                                         <View style={styles.inputGroup}>
@@ -276,7 +276,7 @@ export default function AddTransactionScreen() {
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Data</Text>
                                                 <View style={styles.selectRow}>
-                                                        <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" />
+                                                        <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" placeholderTextColor={theme.colors.placeholder}/>
                                                         <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} />
                                                 </View>
                                         </View>
@@ -321,13 +321,13 @@ export default function AddTransactionScreen() {
 
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Local / Beneficiário</Text>
-                                                <TextInput style={styles.input} placeholder="Ex: Padaria do Zé, Maria Silva..." value={payee} onChangeText={setPayee} />
+                                                <TextInput style={styles.input} placeholder="Ex: Padaria do Zé, Maria Silva..." placeholderTextColor={theme.colors.placeholder} value={payee} onChangeText={setPayee} />
                                         </View>
                                         <View style={styles.divider} />
 
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Tags (separadas por vírgula)</Text>
-                                                <TextInput style={styles.input} placeholder="Ex: viagem, carro, emergencia" value={tags} onChangeText={setTags} />
+                                                <TextInput style={styles.input} placeholder="Ex: viagem, carro, emergencia" placeholderTextColor={theme.colors.placeholder} value={tags} onChangeText={setTags} />
                                         </View>
                                         <View style={styles.divider} />
 
