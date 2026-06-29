@@ -27,7 +27,7 @@ export function RegisterScreen() {
                 try {
                         await authService.register(email, password, nome, cpf, telefone);
 
-                        AppToast.success('Conta criada!', 'Agora você já pode fazer o seu login.');
+                        AppToast.success('Sua conta foi criada com sucesso!', 'Agora você já pode fazer o seu login.');
                         navigation.navigate('Login');
                 } catch (error: any) {
                         handleError(error.message, 'Erro ao criar conta');

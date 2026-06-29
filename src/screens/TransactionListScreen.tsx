@@ -8,6 +8,7 @@ import { transactionService } from '../services/transactionService';
 import { dateUtils, DateInfo } from '../utils/dateUtils'
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { handleError } from '../utils/errorHandler';
 
 export default function TransactionsListScreen() {
         const navigation = useNavigation();
@@ -90,9 +91,8 @@ export default function TransactionsListScreen() {
                         fetchTransactions();
 
                         setSelectedTransaction(null);
-                } catch (error) {
-                        Alert.alert("Erro", "Não foi possível atualizar a movimentação")
-                        console.error(error);
+                } catch (error: any) {
+                        handleError(error.message, 'Não foi possível atualizar a movimentação!');
                 } finally {
                         setIsSavingTransaction(false);
                 }
@@ -115,9 +115,8 @@ export default function TransactionsListScreen() {
                                         },
                                 ]
                         );
-                } catch (error) {
-                        Alert.alert("Erro", "Não foi possível deletar a movimentação")
-                        console.error(error);
+                } catch (error: any) {
+                        handleError(error.message, 'Não foi possível deletar a movimentação!');
                 }
         }
 
