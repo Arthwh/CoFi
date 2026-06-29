@@ -12,6 +12,8 @@ import { paymentMethodService } from '../services/paymentMethodService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
+import { AppToast } from '../utils/toast';
+import { handleError } from '../utils/errorHandler';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
@@ -21,7 +23,6 @@ export default function AddTransactionScreen() {
         const transactionToEdit = route.params?.transactionToEdit;
 
         const [isEditing, setIsEditing] = useState(false);
-        const [contentWasEdited, setContentWasEdited] = useState(false);
 
         const [categories, setCategories] = useState<Category[]>([]);
         const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -88,7 +89,7 @@ export default function AddTransactionScreen() {
                 loadInitialData();
         }, []);
 
-        // Seta os dados no modo edição
+        // Atribui os dados para o modo de edição
         useEffect(() => {
                 if (transactionToEdit && !isEditing) {
                         setIsEditing(true);
@@ -112,8 +113,6 @@ export default function AddTransactionScreen() {
         }, [transactionToEdit, isEditing]);
 
         const handleSaveTransaction = async () => {
-                if (!description || !amount) return;
-
                 setLoading(true);
                 const [dia, mes, ano] = date.split('/');
                 const dataFormatada = `${ano}-${mes}-${dia}`;
@@ -140,16 +139,16 @@ export default function AddTransactionScreen() {
                 try {
                         if (isEditing) {
                                 await transactionService.update(transactionToEdit.id, payload)
-                                Alert.alert('Sucesso', 'Movimentação atualizada com sucesso!');
+                                AppToast.success('Movimentação atualizada com sucesso!');
                                 // Volta para a tela anterior
                                 navigation.goBack();
                         }
                         else {
                                 await transactionService.create(payload);
-                                Alert.alert('Sucesso', 'Movimentação salva com sucesso!');
+                                AppToast.success('Movimentação criada com sucesso!', 'Você pode visualizá-la na aba de listagem.');
                         }
-                } catch (e) {
-                        Alert.alert('Erro', 'Erro ao salvar');
+                } catch (error: any) {
+                        handleError(error.message, 'Erro ao salvar movimentação');
                 } finally {
                         resetForm();
                         setLoading(false);
@@ -276,7 +275,7 @@ export default function AddTransactionScreen() {
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Data</Text>
                                                 <View style={styles.selectRow}>
-                                                        <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" placeholderTextColor={theme.colors.placeholder}/>
+                                                        <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" placeholderTextColor={theme.colors.placeholder} />
                                                         <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} />
                                                 </View>
                                         </View>
