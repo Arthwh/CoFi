@@ -1,10 +1,19 @@
 import { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
+import { Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { theme } from '../theme';
 import { authService } from '../services/authService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { useNavigation } from '@react-navigation/native';
+import { handleError } from '../utils/errorHandler';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from '../routes/AuthRoutes';
+import { AppToast } from '../utils/toast';
 
-export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
+type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
+
+export function RegisterScreen() {
+        const navigation = useNavigation<RegisterScreenNavigationProp>();
+
         const [nome, setNome] = useState('');
         const [cpf, setCpf] = useState('');
         const [telefone, setTelefone] = useState('');
@@ -17,16 +26,18 @@ export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
                 setLoading(true);
                 try {
                         await authService.register(email, password, nome, cpf, telefone);
-                        Alert.alert('Sucesso', 'Conta criada! Faça login para continuar.');
-                        onSwitch(); // Volta para a tela de login após criar a conta
+
+                        AppToast.success('Conta criada!', 'Agora você já pode fazer o seu login.');
+                        navigation.navigate('Login');
                 } catch (error: any) {
-                        Alert.alert('Erro', error.message);
+                        handleError(error.message, 'Erro ao criar conta');
+                } finally {
+                        setLoading(false);
                 }
-                setLoading(false)
         };
 
         if (loading) {
-                return <LoadingIndicator message="Carregando suas movimentações..." />;
+                return <LoadingIndicator message="Carregando..." />;
         }
 
         return (
@@ -44,7 +55,7 @@ export default function RegisterScreen({ onSwitch }: { onSwitch: () => void }) {
                                         <Text style={styles.buttonText}>Cadastrar</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.switchButton} onPress={onSwitch}>
+                                <TouchableOpacity style={styles.switchButton} onPress={() => navigation.goBack()}>
                                         <Text style={styles.switchText}>Já tem conta? Faça Login</Text>
                                 </TouchableOpacity>
                         </ScrollView>

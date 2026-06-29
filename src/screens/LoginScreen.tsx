@@ -1,25 +1,35 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { theme } from '../theme';
 import { authService } from '../services/authService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { handleError } from '../utils/errorHandler';
+import { AuthStackParamList } from '../routes/AuthRoutes';
 
-// Recebe a função onSwitch para trocar para a tela de cadastro
-export default function LoginScreen({ onSwitch }: { onSwitch: () => void }) {
+type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
+
+export function LoginScreen() {
+        const navigation = useNavigation<LoginScreenNavigationProp>();
+
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
-
         const [loading, setLoading] = useState(false);
 
         const handleLogin = async () => {
+                if (!email || !password) {
+                        return handleError(new Error("Preencha todos os campos."), "Atenção");
+                }
+
                 setLoading(true);
                 try {
                         await authService.login(email, password);
-                        Alert.alert('Sucesso', 'Login realizado!');
-                } catch (error: any) {
-                        Alert.alert('Erro', error.message);
+                } catch (error: unknown) {
+                        handleError(error, 'Erro ao entrar');
+                        setLoading(false);
                 }
-                setLoading(false);
         };
 
         if (loading) {
@@ -54,7 +64,10 @@ export default function LoginScreen({ onSwitch }: { onSwitch: () => void }) {
                                         <Text style={styles.buttonText}>Acessar</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.switchButton} onPress={onSwitch}>
+                                <TouchableOpacity
+                                        style={styles.switchButton}
+                                        onPress={() => navigation.navigate('Register')}
+                                >
                                         <Text style={styles.switchText}>Não tem conta? Cadastre-se</Text>
                                 </TouchableOpacity>
                         </View>
