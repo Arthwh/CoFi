@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { theme } from '../theme';
@@ -6,6 +6,8 @@ import { userService } from '../services/userService';
 import { authService } from '../services/authService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { useFocusEffect } from '@react-navigation/native';
+import { handleError } from '../utils/errorHandler';
+import { AppToast } from '../utils/toast';
 
 export default function ProfileScreen() {
         const [loading, setLoading] = useState(true);
@@ -28,9 +30,13 @@ export default function ProfileScreen() {
         );
 
         const carregarDados = async () => {
-                const profile = await userService.getUserProfile();
-                console.log(profile)
-                if (profile) {
+                setLoading(true);
+                try {
+                        const profile = await userService.getUserProfile();
+                        if (!profile) {
+                                throw Error;
+                        }
+
                         setId(profile.id);
                         setName(profile.name);
                         setPhone(profile.phone);
@@ -40,8 +46,11 @@ export default function ProfileScreen() {
                         // Formata a data de criação
                         const dataCriacao = new Date(profile.createdAt);
                         setCreatedAt(dataCriacao.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }));
+
+                        setLoading(false);
+                } catch (error: any) {
+                        handleError(error.message, 'Não foi possível carregar os seus dados.');
                 }
-                setLoading(false);
         };
 
         const handleSave = async () => {
@@ -53,9 +62,9 @@ export default function ProfileScreen() {
                         });
 
                         setIsEditing(false);
-                        Alert.alert('Sucesso', 'Seus dados foram atualizados!');
-                } catch (error) {
-                        Alert.alert('Erro', 'Não foi possível atualizar os dados.');
+                        AppToast.success('Seus dados foram atualizados com sucesso!');
+                } catch (error: any) {
+                        handleError(error.message, 'Não foi possível atualizar os seus dados.');
                 } finally {
                         setSaving(false);
                 }
@@ -187,7 +196,7 @@ export default function ProfileScreen() {
                                         <Text style={[styles.buttonText, styles.logoutText]}>Sair da conta</Text>
                                 </TouchableOpacity>
 
-                                {/* Botão de Sair */}
+                                {/* Botão de Deletar Conta */}
                                 <TouchableOpacity style={[styles.button, styles.deleteButton, styles.shadow]} onPress={handleDelete}>
                                         <Ionicons name="trash" size={24} color={theme.colors.white} />
                                         <Text style={[styles.buttonText, styles.deleteText]}>Deletar conta</Text>
