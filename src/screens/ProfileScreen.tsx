@@ -77,7 +77,11 @@ export default function ProfileScreen() {
                                 text: 'Sair',
                                 style: 'destructive',
                                 onPress: async () => {
-                                        await authService.signOut();
+                                        try {
+                                                await authService.signOut();
+                                        } catch (error: any) {
+                                                handleError(error.message, 'Ocorreu um erro ao sair da conta. Tente novamente mais tarde.');
+                                        }
                                 }
                         }
                 ]);
@@ -90,7 +94,11 @@ export default function ProfileScreen() {
                                 text: 'Deletar',
                                 style: 'destructive',
                                 onPress: async () => {
-                                        await userService.deleteUserProfile(id);
+                                        try {
+                                                await userService.deleteUserProfile(id);
+                                        } catch (error: any) {
+                                                handleError(error.message, 'Não foi possível deletar a sua conta. Tente novamente mais tarde.');
+                                        }
                                 }
                         }
                 ]);
