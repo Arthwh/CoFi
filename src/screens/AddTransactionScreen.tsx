@@ -69,23 +69,6 @@ export default function AddTransactionScreen() {
         );
 
         useEffect(() => {
-                const loadInitialData = async () => {
-                        try {
-                                const userData = await userService.getUserProfile();
-                                if (userData) setUserId(userData.id);
-
-                                const categoriesData = await categoryService.getCategories();
-                                if (categoriesData) setCategories(categoriesData);
-
-                                const paymentData = await paymentMethodService.getPaymentMethods();
-                                if (paymentData) setPaymentMethods(paymentData);
-                        } catch (e) {
-                                console.error(e);
-                        } finally {
-                                setLoading(false);
-                        }
-                };
-
                 loadInitialData();
         }, []);
 
@@ -111,6 +94,24 @@ export default function AddTransactionScreen() {
                         setDaysBeforeNotify(transactionToEdit.daysBeforeNotify)
                 }
         }, [transactionToEdit, isEditing]);
+
+        const loadInitialData = async () => {
+                try {
+                        const [userData, categoriesData, paymentMethodsData] = await Promise.all([
+                                userService.getUserProfile(),
+                                categoryService.getCategories(),
+                                paymentMethodService.getPaymentMethods()
+                        ])
+
+                        if (userData) setUserId(userData.id);
+                        if (categoriesData) setCategories(categoriesData);
+                        if (paymentMethodsData) setPaymentMethods(paymentMethodsData);
+                } catch (error: any) {
+                        handleError(error.message, 'Houve um erro ao carregar os dados. Tente novamente mais tarde.');
+                } finally {
+                        setLoading(false);
+                }
+        };
 
         const handleSaveTransaction = async () => {
                 setLoading(true);
