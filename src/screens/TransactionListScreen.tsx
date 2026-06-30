@@ -9,6 +9,8 @@ import { dateUtils, DateInfo } from '../utils/dateUtils'
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { handleError } from '../utils/errorHandler';
+import { AppConfirm } from '../components/CustomConfirmModal';
+import { AppToast } from '../utils/toast';
 
 export default function TransactionsListScreen() {
         const navigation = useNavigation();
@@ -63,13 +65,17 @@ export default function TransactionsListScreen() {
         }, [currentDateInfo.monthNumber, currentDateInfo.year]);
 
         const fetchTransactions = async () => {
-                // Passa o número do mês e o ano extraídos do objeto
-                const data = await transactionService.getActiveTransactionsByMonth(
-                        currentDateInfo.monthNumber,
-                        currentDateInfo.year
-                );
-                if (data) setTransactions(data);
-                setLoading(false);
+                try {
+                        // Passa o número do mês e o ano extraídos do objeto
+                        const data = await transactionService.getActiveTransactionsByMonth(
+                                currentDateInfo.monthNumber,
+                                currentDateInfo.year
+                        );
+                        if (data) setTransactions(data);
+                        setLoading(false);
+                } catch (error: any) {
+                        handleError(error.message, 'Não foi possível carregar as suas movimentações. Tente novamente mais tarde!');
+                }
         };
 
         // Funções para os botões de Avançar e Voltar Mês
@@ -88,9 +94,9 @@ export default function TransactionsListScreen() {
                         setIsSavingTransaction(true);
                         await transactionService.markTransactionAsPaid(transactionId);
 
-                        fetchTransactions();
-
                         setSelectedTransaction(null);
+                        fetchTransactions();
+                        AppToast.success('Movimentação marcada como paga com sucesso!');
                 } catch (error: any) {
                         handleError(error.message, 'Não foi possível atualizar a movimentação!');
                 } finally {
@@ -98,26 +104,24 @@ export default function TransactionsListScreen() {
                 }
         }
 
-        const handleDeleteTransaction = (transactionId: string) => {
-                try {
-                        Alert.alert(
-                                'Deseja deletar a movimentação?',
-                                'Esta ação não pode ser desfeita',
-                                [
-                                        { text: 'Cancelar', style: 'cancel' },
-                                        {
-                                                text: 'Deletar',
-                                                style: 'destructive',
-                                                onPress: async () => {
-                                                        await transactionService.delete(transactionId);
-                                                        fetchTransactions();
-                                                },
-                                        },
-                                ]
-                        );
-                } catch (error: any) {
-                        handleError(error.message, 'Não foi possível deletar a movimentação!');
-                }
+        const handleDeleteTransaction = async (transactionId: string) => {
+                AppConfirm.show({
+                        title: 'Deletar Movimentação',
+                        message: 'Tem certeza que deseja deletar a movimentação? Essa ação é irreversível!',
+                        confirmText: 'Deletar',
+                        isDestructive: true,
+                        onConfirm: async () => {
+                                try {
+                                        await transactionService.delete(transactionId);
+
+                                        setSelectedTransaction(null);
+                                        fetchTransactions();
+                                        AppToast.success('Movimentação deletada com sucesso!');
+                                } catch (error: any) {
+                                        handleError(error.message, 'Não foi possível deletar a movimentação!');
+                                }
+                        }
+                });
         }
 
         if (loading) {
@@ -192,15 +196,14 @@ export default function TransactionsListScreen() {
                                 onMarkAsPaid={async (id) => {
                                         await handleMarkTransactionAsPaid(id)
                                 }}
-                                onDelete={(id) => {
-                                        handleDeleteTransaction(id);
-                                        setSelectedTransaction(null);
-                                }}
                                 onEdit={(transaction) => {
                                         setSelectedTransaction(null);
 
                                         // Redireciona para a tela de cadastro enviando os dados da movimentação
                                         navigation.navigate('Adicionar', { transactionToEdit: transaction });
+                                }}
+                                onDelete={async (id) => {
+                                        await handleDeleteTransaction(id);
                                 }}
                                 isLoading={isSavingTransaction}
                         />

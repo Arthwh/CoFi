@@ -6,6 +6,7 @@ import { AuthRoutes } from '../routes/AuthRoutes';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { theme } from '../theme';
 import { toastConfig } from '../components/CustomToast';
+import { ConfirmModal, confirmModalRef } from '../components/CustomConfirmModal';
 
 function NavigationConsumer() {
         const { user, loading } = useAuth();
@@ -25,6 +26,7 @@ export function AppProvider() {
         return (
                 <AuthProvider>
                         <NavigationConsumer />
+                        <ConfirmModal ref={confirmModalRef} />
                         <Toast config={toastConfig} />
                 </AuthProvider>
         );

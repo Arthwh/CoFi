@@ -8,6 +8,7 @@ import { LoadingIndicator } from '../components/LoadingIndicator';
 import { useFocusEffect } from '@react-navigation/native';
 import { handleError } from '../utils/errorHandler';
 import { AppToast } from '../utils/toast';
+import { AppConfirm } from '../components/CustomConfirmModal';
 
 export default function ProfileScreen() {
         const [loading, setLoading] = useState(true);
@@ -71,40 +72,37 @@ export default function ProfileScreen() {
         };
 
         const handleLogout = () => {
-                Alert.alert('Sair', 'Tem certeza que deseja sair da conta?', [
-                        { text: 'Cancelar', style: 'cancel' },
-                        {
-                                text: 'Sair',
-                                style: 'destructive',
-                                onPress: async () => {
-                                        try {
-                                                await authService.signOut();
-                                        } catch (error: any) {
-                                                handleError(error.message, 'Ocorreu um erro ao sair da conta. Tente novamente mais tarde.');
-                                        }
+                AppConfirm.show({
+                        title: 'Sair da Conta',
+                        message: 'Tem certeza que deseja sair da sua conta?',
+                        confirmText: 'Sair',
+                        isDestructive: true,
+                        onConfirm: async () => {
+                                try {
+                                        await authService.signOut();
+                                } catch (error: any) {
+                                        handleError(error.message, 'Ocorreu um erro ao sair da conta. Tente novamente mais tarde.');
                                 }
                         }
-                ]);
+                });
         };
 
         const handleDelete = () => {
-                Alert.alert('Deletar', 'Tem certeza que deseja deletar a conta?', [
-                        { text: 'Cancelar', style: 'cancel' },
-                        {
-                                text: 'Deletar',
-                                style: 'destructive',
-                                onPress: async () => {
-                                        try {
-                                                await userService.deleteUserProfile(id);
-                                        } catch (error: any) {
-                                                handleError(error.message, 'Não foi possível deletar a sua conta. Tente novamente mais tarde.');
-                                        }
+                AppConfirm.show({
+                        title: 'Deletar a Conta',
+                        message: 'Tem certeza que deseja deletar a conta? Essa ação é irreversível!',
+                        confirmText: 'Deletar',
+                        isDestructive: true,
+                        onConfirm: async () => {
+                                try {
+                                        await userService.deleteUserProfile(id);
+                                } catch (error: any) {
+                                        handleError(error.message, 'Não foi possível deletar a sua conta. Tente novamente mais tarde.');
                                 }
                         }
-                ]);
+                });
         }
 
-        // Pega a primeira letra do nome para o Avatar
         const avatarLetter = name ? name.charAt(0).toUpperCase() : '?';
 
         if (loading) {
