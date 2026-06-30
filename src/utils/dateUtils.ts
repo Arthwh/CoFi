@@ -56,6 +56,10 @@ export const dateUtils = {
                 return new Date().toISOString()
         },
 
+        currentDate(){
+                return new Date().toLocaleDateString('pt-BR')
+        },
+
         formatDateToNamedFormat(data: string) {
                 return new Date(data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
         },

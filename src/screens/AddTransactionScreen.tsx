@@ -5,12 +5,13 @@ import { theme } from '../theme';
 import { CategoryPickerModal } from '../components/CategoryPickerModal';
 import { TransactionStatusPicker } from '../components/TransactionStatusPicker';
 import { PaymentMethodPicker } from '../components/PaymentMethodPicker';
-import { transactionService } from '../services/transactionService'
+import { transactionService } from '../services/transactionService';
 import { userService } from '../services/userService';
 import { categoryService } from '../services/categoryService';
 import { paymentMethodService } from '../services/paymentMethodService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { RootStackParamList } from '../types/navigation';
 import { AppToast } from '../utils/toast';
 import { handleError } from '../utils/errorHandler';
@@ -21,6 +22,9 @@ import { TransactionStatus } from '../types/TransactionStatusType';
 import { Category } from '../dtos/CategoryDto';
 import { UpdateTransactionDto } from '../dtos/UpdateTransactionDto';
 import { CreateTransactionDto } from '../dtos/CreateTransactionDto';
+import { dateUtils } from '../utils/dateUtils';
+import { formatAmountToString } from '../utils/moneyUtils'
+import { TransactionTypePicker } from '../components/TransactionTypePicker';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
@@ -36,10 +40,10 @@ export default function AddTransactionScreen() {
         const [userId, setUserId] = useState<string | null>(null);
         // Dados Principais
         const [type, setType] = useState<TransactionType>('income');
-        const [amount, setAmount] = useState('');
+        const [amount, setAmount] = useState<string>('0');
         const [description, setDescription] = useState('');
         const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-        const [date, setDate] = useState(new Date().toLocaleDateString('pt-BR'));
+        const [date, setDate] = useState(dateUtils.currentDate());
 
         // Status e Pagamento
         const [status, setStatus] = useState<TransactionStatus>('paid');
@@ -62,6 +66,7 @@ export default function AddTransactionScreen() {
 
         // Controle de Modal
         const [modalVisible, setModalVisible] = useState(false);
+        const [showDatePicker, setShowDatePicker] = useState(false);
 
         const [loading, setLoading] = useState(true);
 
@@ -85,7 +90,7 @@ export default function AddTransactionScreen() {
                         setIsEditing(true);
 
                         setDescription(transactionToEdit.description);
-                        setAmount(String(transactionToEdit.amount));
+                        setAmount(transactionToEdit.amount);
                         setType(transactionToEdit.type);
                         setSelectedCategory(transactionToEdit.category);
                         setSelectedPaymentMethod(transactionToEdit.paymentMethod);
@@ -120,6 +125,12 @@ export default function AddTransactionScreen() {
                 }
         };
 
+        const handleAmountChange = (text: string) => {
+                // Remove tudo que não for número
+                const cleanNumber = text.replace(/\D/g, '');
+                setAmount(cleanNumber);
+        };
+
         const handleSaveTransaction = async () => {
                 setLoading(true);
                 const [dia, mes, ano] = date.split('/');
@@ -129,7 +140,7 @@ export default function AddTransactionScreen() {
                         if (isEditing) {
                                 const payload: UpdateTransactionDto = {
                                         description,
-                                        amount: parseFloat(amount.replace(',', '.')),
+                                        amount: Number(amount),
                                         category_id: selectedCategory!.id,
                                         payment_method_id: selectedPaymentMethod!.id,
                                         status,
@@ -150,7 +161,7 @@ export default function AddTransactionScreen() {
                                 const payload: CreateTransactionDto = {
                                         user_id: userId!,
                                         type,
-                                        amount: parseFloat(amount.replace(',', '.')),
+                                        amount: Number(amount),
                                         description,
                                         category_id: selectedCategory!.id,
                                         date: dataFormatada,
@@ -178,10 +189,10 @@ export default function AddTransactionScreen() {
 
         const resetForm = () => {
                 setType('income');
-                setAmount('');
+                setAmount('0');
                 setDescription('');
                 setSelectedCategory(null);
-                setDate(new Date().toLocaleDateString('pt-BR'));
+                setDate(dateUtils.currentDate());
                 setStatus('paid');
                 setSelectedPaymentMethod(null);
                 setFrequency(null);
@@ -208,30 +219,14 @@ export default function AddTransactionScreen() {
                                 <Text style={styles.headerTitle}>{isEditing ? 'Editar Movimentação' : 'Nova Movimentação'}</Text>
 
                                 {/* Seletor de Tipo de Movimentação */}
-                                <View style={styles.typeSelectorRow}>
-                                        <TouchableOpacity
-                                                style={[styles.typeButton, type === 'income' && styles.modernIncomeActive]}
-                                                onPress={() => setType('income')}
-                                        >
-                                                <Ionicons name="arrow-up-circle" size={22} color={type === 'income' ? '#10B981' : theme.colors.textLight} />
-                                                <Text style={[styles.typeButtonText, type === 'income' && styles.textIncome]}>Entrada</Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                                style={[styles.typeButton, type === 'expense' && styles.modernExpenseActive]}
-                                                onPress={() => setType('expense')}
-                                        >
-                                                <Ionicons name="arrow-down-circle" size={22} color={type === 'expense' ? '#EF4444' : theme.colors.textLight} />
-                                                <Text style={[styles.typeButtonText, type === 'expense' && styles.textExpense]}>Saída</Text>
-                                        </TouchableOpacity>
-                                </View>
+                                <TransactionTypePicker type={type} onPress={setType} />
 
                                 {/* Valor e Status */}
                                 <View style={[styles.card, styles.shadow, styles.amountCard]}>
                                         <Text style={styles.inputLabelLabel}>Valor da Transação</Text>
                                         <View style={styles.amountInputContainer}>
                                                 <Text style={styles.currencyPrefix}>R$</Text>
-                                                <TextInput style={styles.amountInput} placeholder="0,00" placeholderTextColor={theme.colors.placeholder} keyboardType="numeric" value={amount} onChangeText={setAmount} />
+                                                <TextInput style={styles.amountInput} placeholderTextColor={theme.colors.placeholder} keyboardType="numeric" value={formatAmountToString(amount)} onChangeText={handleAmountChange} />
                                         </View>
 
                                         <TransactionStatusPicker status={status} onChange={setStatus} isExpense={type === 'expense'} />
@@ -296,8 +291,12 @@ export default function AddTransactionScreen() {
                                         <View style={styles.inputGroup}>
                                                 <Text style={styles.inputLabel}>Data</Text>
                                                 <View style={styles.selectRow}>
-                                                        <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" placeholderTextColor={theme.colors.placeholder} />
-                                                        <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} />
+                                                        <TouchableOpacity style={styles.selectRow} onPress={() => setShowDatePicker(true)}>
+                                                                <Text style={styles.inputClean}>{date}</Text>
+                                                                <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} />
+                                                        </TouchableOpacity>
+                                                        {/* <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" placeholderTextColor={theme.colors.placeholder} />
+                                                        <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} /> */}
                                                 </View>
                                         </View>
                                 </View>
@@ -367,6 +366,21 @@ export default function AddTransactionScreen() {
                         </ScrollView>
 
                         <CategoryPickerModal visible={modalVisible} onClose={() => setModalVisible(false)} categories={categories!} onSelectCategory={setSelectedCategory} />
+
+                        {showDatePicker && (
+                                <DateTimePicker
+                                        value={new Date()}
+                                        mode="date"
+                                        display="default"
+                                        onValueChange={(event, selectedDate) => {
+                                                setShowDatePicker(false);
+                                                if (selectedDate) {
+                                                        // Formata e salva no estado
+                                                        setDate(selectedDate.toLocaleDateString('pt-BR'));
+                                                }
+                                        }}
+                                />
+                        )}
                 </SafeAreaView>
         );
 }
