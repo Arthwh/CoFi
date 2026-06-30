@@ -1,35 +1,38 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { userService } from '../services/userService';
-import { transactionService, BalanceData } from '../services/transactionService';
+import { transactionService } from '../services/transactionService';
 import { formatCurrencyToBRL } from '../utils/moneyUtils'
+import { UserDto } from '../dtos/UserDto';
+import { BalanceDto } from '../dtos/BalanceDto';
+import { handleError } from '../utils/errorHandler';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen() {
         const [loading, setLoading] = useState(true);
-        const [userName, setUserName] = useState('');
-        const [balance, setBalance] = useState<BalanceData>({ total: 0, income: 0, expense: 0 });
+        const [user, setUser] = useState<UserDto>();
+        const [balance, setBalance] = useState<BalanceDto>();
 
-        useEffect(() => {
-                getUserData()
-                setLoading(false)
-        }, [])
+        useFocusEffect(
+                useCallback(() => {
+                        getUserData()
+                        return () => { };
+                }, [])
+        );
 
         const getUserData = async () => {
                 try {
-                        // Busca os dados em paralelo
-                        const [userData, balanceData] = await Promise.all([
-                                userService.getUserProfile(),
-                                transactionService.getBalance()
-                        ]);
+                        const userData = await userService.getUserProfile();
+                        if (userData) setUser(userData);
 
-                        if (userData) setUserName(userData.name);
+                        const balanceData = await transactionService.getBalance(user!.id);
                         if (balanceData) setBalance(balanceData);
 
-                } catch (error) {
-                        console.error('Erro ao carregar dados da Home:', error);
+                } catch (error: any) {
+                        handleError(error.message, 'Erro ao carregar os dados');
                 } finally {
                         setLoading(false);
                 }
@@ -46,7 +49,7 @@ export default function HomeScreen() {
                                 {/* HEADER */}
                                 <View style={styles.header}>
                                         <View>
-                                                <Text style={styles.greeting}>Olá, {userName?.split(" ")[0] || 'Usuário'}</Text>
+                                                <Text style={styles.greeting}>Olá, {user?.name.split(" ")[0] || 'Usuário'}</Text>
                                                 <Text style={styles.subtitle}>Bem-vindo de volta!</Text>
                                         </View>
                                         <TouchableOpacity style={styles.notificationBtn}>
@@ -57,7 +60,7 @@ export default function HomeScreen() {
                                 {/* CARD DE SALDO REAL */}
                                 <View style={[styles.card, styles.balanceCard, styles.shadow]}>
                                         <Text style={styles.balanceLabel}>Balanço Total</Text>
-                                        <Text style={styles.balanceValue}>{formatCurrencyToBRL(balance.total)}</Text>
+                                        <Text style={styles.balanceValue}>{formatCurrencyToBRL(balance?.total_balance || 0)}</Text>
 
                                         <View style={styles.balanceRow}>
                                                 <View>
@@ -65,7 +68,7 @@ export default function HomeScreen() {
                                                                 <Ionicons name="arrow-up-circle" size={16} color="rgba(255,255,255,0.7)" />
                                                                 <Text style={styles.balanceSubLabel}>Entradas</Text>
                                                         </View>
-                                                        <Text style={styles.balanceIn}>{formatCurrencyToBRL(balance.income)}</Text>
+                                                        <Text style={styles.balanceIn}>{formatCurrencyToBRL(balance?.income || 0)}</Text>
                                                 </View>
 
                                                 <View>
@@ -73,7 +76,7 @@ export default function HomeScreen() {
                                                                 <Ionicons name="arrow-down-circle" size={16} color="rgba(255,255,255,0.7)" />
                                                                 <Text style={styles.balanceSubLabel}>Saídas</Text>
                                                         </View>
-                                                        <Text style={styles.balanceOut}>{formatCurrencyToBRL(balance.expense)}</Text>
+                                                        <Text style={styles.balanceOut}>{formatCurrencyToBRL(balance?.expense || 0)}</Text>
                                                 </View>
                                         </View>
                                 </View>
@@ -89,9 +92,9 @@ export default function HomeScreen() {
                                         {/* Exemplo de cálculo: Saídas vs Meta de Gastos (ex: R$ 3.000,00) */}
                                         <View style={styles.progressInfoRow}>
                                                 <Text style={styles.progressText}>
-                                                        Você já usou <Text style={styles.boldText}>{((balance.expense / 3000) * 100).toFixed(0)}%</Text> do limite
+                                                        Você já usou <Text style={styles.boldText}>{(((balance?.expense || 0 / 3000) * 100)).toFixed(0)}%</Text> do limite
                                                 </Text>
-                                                <Text style={styles.progressSubText}>{formatCurrencyToBRL(balance.expense)} de R$ 3.000,00</Text>
+                                                <Text style={styles.progressSubText}>{formatCurrencyToBRL(balance?.expense || 0)} de R$ 3.000,00</Text>
                                         </View>
 
                                         {/* Barra de Progresso Visual */}
@@ -100,9 +103,9 @@ export default function HomeScreen() {
                                                         style={[
                                                                 styles.progressBarFill,
                                                                 {
-                                                                        width: `${Math.min((balance.expense / 3000) * 100, 100)}%`,
+                                                                        width: `${Math.min((balance?.expense || 0 / 3000) * 100, 100)}%`,
                                                                         // Fica vermelho se passar de 80% do orçamento
-                                                                        backgroundColor: (balance.expense / 3000) > 0.8 ? theme.colors.danger : theme.colors.primary
+                                                                        backgroundColor: (balance?.expense || 0 / 3000) > 0.8 ? theme.colors.danger : theme.colors.primary
                                                                 }
                                                         ]}
                                                 />

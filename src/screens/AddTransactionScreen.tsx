@@ -39,7 +39,7 @@ export default function AddTransactionScreen() {
         const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
 
         // Frequência e Parcelamento
-        const [frequency, setFrequency] = useState<'single' | 'installment' | 'fixed'>('single');
+        const [frequency, setFrequency] = useState<'single' | 'installment' | 'fixed' | null>(null);
         const [installmentsCount, setInstallmentsCount] = useState('2');
 
         // Outros dados opcionais
@@ -50,7 +50,7 @@ export default function AddTransactionScreen() {
 
         // Funcionalidade de notificações
         const [notifyMe, setNotifyMe] = useState(false);
-        const [daysBeforeNotify, setDaysBeforeNotify] = useState('1'); // Quantos dias antes avisar
+        const [daysBeforeNotify, setDaysBeforeNotify] = useState<string | null>(null); // Quantos dias antes avisar
         const showNotificationOption = status === 'unpaid' || status === 'scheduled' || frequency === 'installment';
 
         // Controle de Modal
@@ -134,7 +134,7 @@ export default function AddTransactionScreen() {
                         ignore_in_dashboard: ignoreInDashboard,
                         notes,
                         notify_me: notifyMe,
-                        days_before_notify: notifyMe === true ? parseInt(daysBeforeNotify) : null
+                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
                 };
 
                 try {
@@ -164,14 +164,14 @@ export default function AddTransactionScreen() {
                 setDate(new Date().toLocaleDateString('pt-BR'));
                 setStatus('paid');
                 setSelectedPaymentMethod(null);
-                setFrequency('single');
+                setFrequency(null);
                 setInstallmentsCount('2');
                 setPayee('');
                 setTags('');
                 setIgnoreInDashboard(false);
                 setNotes('');
                 setNotifyMe(false);
-                setDaysBeforeNotify('1');
+                setDaysBeforeNotify(null);
 
                 setIsEditing(false)
                 navigation.setParams({ transactionToEdit: undefined });

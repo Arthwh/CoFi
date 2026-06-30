@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { TransactionStatus } from '../components/TransactionStatusPicker';
+import { BalanceDto } from '../dtos/BalanceDto';
 
 // Interface do Payload de cadastro
 export interface CreateTransactionPayload {
@@ -11,7 +12,7 @@ export interface CreateTransactionPayload {
         date: string;
         status: TransactionStatus;
         payment_method_id: string | null;
-        frequency: 'single' | 'installment' | 'fixed';
+        frequency: 'single' | 'installment' | 'fixed' | null;
         installments?: number;
         payee?: string;
         tags?: string[];
@@ -19,12 +20,6 @@ export interface CreateTransactionPayload {
         notes?: string;
         notify_me: boolean;
         days_before_notify?: number | null;
-}
-
-export interface BalanceData {
-        total: number;
-        income: number;
-        expense: number;
 }
 
 export const transactionService = {
@@ -82,8 +77,21 @@ export const transactionService = {
                 return data;
         },
 
-        async getBalance() {
-                return { total: 0, income: 0, expense: 0 }
+        async getBalance(userId: string) {
+                const { data, error } = await supabase
+                        .from('balance')
+                        .select('*')
+                        .eq('user_id', userId)
+                        .single(); // Retorna um objeto, em vez de um array
+
+                if (error) {
+                        if (error.code === 'PGRST116') {
+                                return { income: 0, expense: 0, total_balance: 0 } as BalanceDto;
+                        }
+                        throw error;
+                }
+
+                return data as BalanceDto;
         },
 
         async markTransactionAsPaid(transactionId: string) {

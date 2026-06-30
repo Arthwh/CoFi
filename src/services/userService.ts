@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { authService } from './authService';
+import { UserDto } from '../dtos/UserDto';
 
 export const userService = {
         async getUserProfile() {
@@ -15,11 +16,13 @@ export const userService = {
                 return {
                         id: user.id,
                         email: user.email,
-                        createdAt: user.created_at,
                         name: user.user_metadata?.full_name || '',
                         phone: user.user_metadata?.phone || '',
                         cpf: user.user_metadata?.cpf || '',
-                };
+                        createdAt: user.created_at,
+                        updatedAt: user.user_metadata?.updatedAt || null,
+                        deletedAt: user.user_metadata?.deletedAt || null
+                } as UserDto;
         },
 
         async updateUserProfile(updates: { name?: string; phone?: string; cpf?: string }) {
