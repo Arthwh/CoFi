@@ -6,11 +6,10 @@ export const userService = {
                 const { data: { user }, error } = await supabase.auth.getUser();
 
                 if (error) {
-                        console.error('Erro ao buscar dados do usuário:', error.message);
-                        return null;
+                        throw Error(error.message);
                 }
 
-                if (!user) return null;
+                if (!user) throw Error('Usuário não encontrado!');
 
                 // Retorna os dados nativos de auth + os dados customizados (user_metadata)
                 return {
@@ -29,14 +28,13 @@ export const userService = {
                 });
 
                 if (error) {
-                        console.error('Erro ao atualizar perfil:', error.message);
                         throw error;
                 }
 
                 return data.user;
         },
 
-        async deleteUserProfile(userId: string) {
+        async deleteUserProfile() {
                 const { data, error } = await supabase.auth.updateUser({
                         data: {
                                 deleted_at: true
@@ -44,7 +42,6 @@ export const userService = {
                 });
 
                 if (error) {
-                        console.error('Erro ao deletar perfil:', error.message);
                         throw error;
                 }
 

@@ -8,7 +8,7 @@ export const authService = {
                 });
                 if (data.user?.deleted_at) {
                         await this.signOut();
-                        throw "Conta do usuário está inativa."
+                        throw Error("Conta do usuário está inativa.")
                 }
 
                 if (error) throw error;
@@ -37,11 +37,13 @@ export const authService = {
                 const { data: { session }, error } = await supabase.auth.getSession();
 
                 if (error) {
-                        console.error("Erro ao buscar sessão:", error);
-                        return null;
+                        throw error;
+                }
+                if (!session) {
+                        throw Error('Sessão não encontrada!')
                 }
 
-                return session?.user ?? null;
+                return session.user;
         },
 
         // Busca mudanças no estado da sessão, e executa callback
@@ -56,10 +58,11 @@ export const authService = {
 
         async signOut() {
                 const { error } = await supabase.auth.signOut();
+
                 if (error) {
-                        console.error("Erro ao fazer logOut:", error);
-                        return error.message;
+                        return error;
                 }
+
                 return null
         }
 };

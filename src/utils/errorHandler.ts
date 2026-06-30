@@ -1,4 +1,3 @@
-import Toast from 'react-native-toast-message';
 import { AppToast } from './toast';
 
 export function handleError(error: unknown, customMessage?: string) {

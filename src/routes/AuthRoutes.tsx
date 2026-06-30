@@ -2,7 +2,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 
-// Definição dos nomes das telas para o TypeScript
 export type AuthStackParamList = {
         Login: undefined;
         Register: undefined;

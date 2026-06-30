@@ -95,7 +95,7 @@ export default function ProfileScreen() {
                         isDestructive: true,
                         onConfirm: async () => {
                                 try {
-                                        await userService.deleteUserProfile(id);
+                                        await userService.deleteUserProfile();
                                 } catch (error: any) {
                                         handleError(error.message, 'Não foi possível deletar a sua conta. Tente novamente mais tarde.');
                                 }

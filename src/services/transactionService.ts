@@ -30,12 +30,11 @@ export interface BalanceData {
 export const transactionService = {
         async create(payload: CreateTransactionPayload) {
                 const { data, error } = await supabase
-                        .from('transactions') //Tabela
+                        .from('transactions') // Tabela
                         .insert([payload])
                         .select(); // Retorna o dado criado com o id gerado
 
                 if (error) {
-                        console.error('Erro ao inserir transação:', error.message);
                         throw error;
                 }
 
@@ -52,7 +51,6 @@ export const transactionService = {
                         `);
 
                 if (error) {
-                        console.error('Erro ao obter transações:', error.message);
                         throw error;
                 }
 
@@ -78,7 +76,6 @@ export const transactionService = {
                         .order('date', { ascending: false }); // Ordena da mais recente para a mais antiga
 
                 if (error) {
-                        console.error('Erro ao obter transações:', error.message);
                         throw error;
                 }
 
@@ -102,7 +99,6 @@ export const transactionService = {
                         .select();
 
                 if (error) {
-                        console.error('Erro ao marcar transação como paga:', error.message);
                         throw error;
                 }
 
@@ -130,7 +126,6 @@ export const transactionService = {
                         .select();
 
                 if (error) {
-                        console.error('Erro ao atualizar movimentação:', error.message);
                         throw error;
                 }
 
@@ -147,7 +142,6 @@ export const transactionService = {
                         .eq('id', transactionId)
 
                 if (error) {
-                        console.error('Erro ao deletar movimentação:', error.message);
                         throw error;
                 }
 
