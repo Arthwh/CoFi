@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
 import { theme } from '../theme';
 import { authService } from '../services/authService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
@@ -20,7 +19,7 @@ export function LoginScreen() {
 
         const handleLogin = async () => {
                 if (!email || !password) {
-                        return handleError(new Error("Preencha todos os campos."), "Atenção");
+                        throw Error("Preencha todos os campos.");
                 }
 
                 setLoading(true);

@@ -2,15 +2,12 @@ import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { theme } from '../theme';
 
 interface LoadingIndicatorProps {
-        message?: string;             // Texto opcional=
-        fullScreen?: boolean;         // Se deve ocupar a tela inteira ou ser embutido
+        message?: string;             // Texto opcional
+        fullScreen?: boolean;         // Deve ocupar a tela inteira ou ser embutido
         size?: 'small' | 'large';     // Tamanho do círculo de loading
 }
 
-export function LoadingIndicator({
-        message,
-        fullScreen = true,
-        size = 'large'
+export function LoadingIndicator({message, fullScreen = true, size = 'large'
 }: LoadingIndicatorProps) {
         return (
                 <View style={[

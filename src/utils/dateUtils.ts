@@ -51,4 +51,17 @@ export const dateUtils = {
                         year
                 };
         },
+
+        now() {
+                return new Date().toISOString()
+        },
+
+        formatDateToNamedFormat(data: string) {
+                return new Date(data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+        },
+
+        //Formata YYYY-MM-DD para DD/MM/YYYY 
+        formatDateFromDashToSlash(data: string) {
+                return data.split('-').reverse().join('/')
+        }
 }

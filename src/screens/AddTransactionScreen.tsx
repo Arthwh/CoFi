@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
-import { Category, CategoryPickerModal } from '../components/CategoryPickerModal';
-import { TransactionStatus, TransactionStatusPicker } from '../components/TransactionStatusPicker';
-import { PaymentMethodPicker, PaymentMethod } from '../components/PaymentMethodPicker';
-import { CreateTransactionPayload, transactionService } from '../services/transactionService'
+import { CategoryPickerModal } from '../components/CategoryPickerModal';
+import { TransactionStatusPicker } from '../components/TransactionStatusPicker';
+import { PaymentMethodPicker } from '../components/PaymentMethodPicker';
+import { transactionService } from '../services/transactionService'
 import { userService } from '../services/userService';
 import { categoryService } from '../services/categoryService';
 import { paymentMethodService } from '../services/paymentMethodService';
@@ -14,6 +14,13 @@ import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navig
 import { RootStackParamList } from '../types/navigation';
 import { AppToast } from '../utils/toast';
 import { handleError } from '../utils/errorHandler';
+import { TransactionType } from '../types/TransactionTypeType';
+import { TransactionFrequency } from '../types/TransactionFrequencyType';
+import { PaymentMethod } from '../dtos/PaymentMethodDto';
+import { TransactionStatus } from '../types/TransactionStatusType';
+import { Category } from '../dtos/CategoryDto';
+import { UpdateTransactionDto } from '../dtos/UpdateTransactionDto';
+import { CreateTransactionDto } from '../dtos/CreateTransactionDto';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
@@ -28,7 +35,7 @@ export default function AddTransactionScreen() {
         const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
         const [userId, setUserId] = useState<string | null>(null);
         // Dados Principais
-        const [type, setType] = useState<'income' | 'expense'>('income');
+        const [type, setType] = useState<TransactionType>('income');
         const [amount, setAmount] = useState('');
         const [description, setDescription] = useState('');
         const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -39,7 +46,7 @@ export default function AddTransactionScreen() {
         const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
 
         // Frequência e Parcelamento
-        const [frequency, setFrequency] = useState<'single' | 'installment' | 'fixed' | null>(null);
+        const [frequency, setFrequency] = useState<TransactionFrequency | null>(null);
         const [installmentsCount, setInstallmentsCount] = useState('2');
 
         // Outros dados opcionais
@@ -118,33 +125,46 @@ export default function AddTransactionScreen() {
                 const [dia, mes, ano] = date.split('/');
                 const dataFormatada = `${ano}-${mes}-${dia}`;
 
-                const payload: CreateTransactionPayload = {
-                        user_id: userId,
-                        type,
-                        amount: parseFloat(amount.replace(',', '.')),
-                        description,
-                        category_id: selectedCategory?.id ? selectedCategory.id : null,
-                        date: dataFormatada,
-                        status,
-                        payment_method_id: selectedPaymentMethod?.id ? selectedPaymentMethod.id : null,
-                        frequency,
-                        installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
-                        payee,
-                        tags: tags.split(',').map(t => t.trim()),
-                        ignore_in_dashboard: ignoreInDashboard,
-                        notes,
-                        notify_me: notifyMe,
-                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
-                };
-
                 try {
                         if (isEditing) {
+                                const payload: UpdateTransactionDto = {
+                                        description,
+                                        amount: parseFloat(amount.replace(',', '.')),
+                                        category_id: selectedCategory!.id,
+                                        payment_method_id: selectedPaymentMethod!.id,
+                                        status,
+                                        payee,
+                                        tags: tags.split(',').map(t => t.trim()),
+                                        ignore_in_dashboard: ignoreInDashboard,
+                                        notes,
+                                        notify_me: notifyMe,
+                                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
+                                }
+
                                 await transactionService.update(transactionToEdit.id, payload)
                                 AppToast.success('Movimentação atualizada com sucesso!');
                                 // Volta para a tela anterior
                                 navigation.goBack();
                         }
                         else {
+                                const payload: CreateTransactionDto = {
+                                        user_id: userId!,
+                                        type,
+                                        amount: parseFloat(amount.replace(',', '.')),
+                                        description,
+                                        category_id: selectedCategory!.id,
+                                        date: dataFormatada,
+                                        status,
+                                        payment_method_id: selectedPaymentMethod!.id,
+                                        frequency: frequency!,
+                                        installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
+                                        payee,
+                                        tags: tags.split(',').map(t => t.trim()),
+                                        ignore_in_dashboard: ignoreInDashboard,
+                                        notes,
+                                        notify_me: notifyMe,
+                                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
+                                };
                                 await transactionService.create(payload);
                                 AppToast.success('Movimentação criada com sucesso!', 'Você pode visualizá-la na aba de listagem.');
                         }

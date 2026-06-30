@@ -11,12 +11,13 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { handleError } from '../utils/errorHandler';
 import { AppConfirm } from '../components/CustomConfirmModal';
 import { AppToast } from '../utils/toast';
+import { Transaction } from '../dtos/TransactionDto';
 
 export default function TransactionsListScreen() {
         const navigation = useNavigation();
 
         const [currentDateInfo, setCurrentDateInfo] = useState<DateInfo>(dateUtils.parseDateData());
-        const [transactions, setTransactions] = useState<any[]>([]);
+        const [transactions, setTransactions] = useState<Transaction[]>([]);
         const [activeFilter, setActiveFilter] = useState<FilterType>('all');
         const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
 
@@ -133,7 +134,7 @@ export default function TransactionsListScreen() {
                         <View style={styles.header}>
                                 <View style={styles.monthSelector}>
                                         <TouchableOpacity onPress={handlePreviousMonth}><Ionicons name="chevron-back" size={24} color={theme.colors.text} /></TouchableOpacity>
-                                        <Text style={styles.monthText}>{currentDateInfo.monthName} {currentDateInfo.year}</Text>
+                                        <TouchableOpacity><Text style={styles.monthText}>{currentDateInfo.monthName} {currentDateInfo.year}</Text></TouchableOpacity>
                                         <TouchableOpacity onPress={handleNextMonth}><Ionicons name="chevron-forward" size={24} color={theme.colors.text} /></TouchableOpacity>
                                 </View>
                         </View>
@@ -150,7 +151,7 @@ export default function TransactionsListScreen() {
                                         // Renderiza o Cabeçalho de cada dia
                                         renderSectionHeader={({ section: { title } }) => (
                                                 <Text style={styles.sectionTitle}>
-                                                        {title.split('-').reverse().join('/')} {/* Formata YYYY-MM-DD para DD/MM/YYYY */}
+                                                        {dateUtils.formatDateFromDashToSlash(title)}
                                                 </Text>
                                         )}
 
@@ -173,7 +174,7 @@ export default function TransactionsListScreen() {
                                                                         </View>
                                                                 </View>
 
-                                                                <Text style={[styles.cardAmount, { color: isIncome ? '#10B981' : theme.colors.text }]}>
+                                                                <Text style={[styles.cardAmount, { color: isIncome ? theme.colors.success : theme.colors.danger }]}>
                                                                         {isIncome ? '+' : '-'} R$ {item.amount.toFixed(2)}
                                                                 </Text>
                                                         </TouchableOpacity>
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
         cardSubTitle: { fontSize: 13, color: theme.colors.textLight },
 
         miniBadge: { backgroundColor: '#3B82F615', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
-        miniBadgeText: { fontSize: 10, fontWeight: 'bold', color: '#3B82F6' },
+        miniBadgeText: { fontSize: 10, fontWeight: 'bold', color: theme.colors.primary },
 
         cardAmount: { fontSize: 16, fontWeight: 'bold' },
 

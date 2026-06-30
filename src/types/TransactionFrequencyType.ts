@@ -1,0 +1,1 @@
+export type TransactionFrequency = 'single' | 'installment' | 'fixed';

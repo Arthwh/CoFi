@@ -1,14 +1,7 @@
 import { ScrollView, TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
-
-// Tipagem para os Métodos de Pagamento
-export interface PaymentMethod {
-        id: string;
-        name: string;
-        icon: keyof typeof Ionicons | string;
-        color: string;
-}
+import { PaymentMethod } from '../dtos/PaymentMethodDto';
 
 interface PaymentMethodPickerProps {
         selected: PaymentMethod | null;

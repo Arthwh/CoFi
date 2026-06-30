@@ -1,3 +1,4 @@
+import { RegisterUserDto } from '../dtos/RegisterUserDto';
 import { supabase } from '../lib/supabase';
 
 export const authService = {
@@ -16,15 +17,15 @@ export const authService = {
         },
 
         // Cadastro com os dados extras (Nome, CPF e telefone)
-        async register(email: string, password: string, nome: string, cpf: string, telefone: string) {
+        async register(payload: RegisterUserDto) {
                 const { data, error } = await supabase.auth.signUp({
-                        email,
-                        password,
+                        email: payload.email,
+                        password: payload.password,
                         options: {
                                 data: {
-                                        full_name: nome,
-                                        cpf: cpf,
-                                        phone: telefone
+                                        full_name: payload.nome,
+                                        cpf: payload.cpf,
+                                        phone: payload.telefone
                                 }
                         }
                 });

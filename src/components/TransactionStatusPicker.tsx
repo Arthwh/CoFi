@@ -1,8 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
-
-export type TransactionStatus = 'paid' | 'unpaid' | 'scheduled';
+import { TransactionStatus } from '../types/TransactionStatusType';
 
 interface StatusPickerProps {
         status: TransactionStatus;

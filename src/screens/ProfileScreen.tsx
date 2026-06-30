@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { userService } from '../services/userService';
@@ -9,6 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { handleError } from '../utils/errorHandler';
 import { AppToast } from '../utils/toast';
 import { AppConfirm } from '../components/CustomConfirmModal';
+import { dateUtils } from '../utils/dateUtils';
 
 export default function ProfileScreen() {
         const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export default function ProfileScreen() {
                 try {
                         const profile = await userService.getUserProfile();
                         if (!profile) {
-                                throw Error;
+                                throw Error("Perfil não carregado.");
                         }
 
                         setId(profile.id);
@@ -45,8 +46,7 @@ export default function ProfileScreen() {
                         setEmail(profile.email || '');
 
                         // Formata a data de criação
-                        const dataCriacao = new Date(profile.createdAt);
-                        setCreatedAt(dataCriacao.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }));
+                        setCreatedAt(profile.createdAt);
 
                         setLoading(false);
                 } catch (error: any) {
@@ -126,7 +126,7 @@ export default function ProfileScreen() {
                                         <Text style={styles.userName}>{name}</Text>
                                         <Text style={styles.userEmail}>{email}</Text>
                                         <View style={styles.badge}>
-                                                <Text style={styles.badgeText}>Membro desde {createdAt}</Text>
+                                                <Text style={styles.badgeText}>Membro desde {dateUtils.formatDateToNamedFormat(createdAt)}</Text>
                                         </View>
                                 </View>
 

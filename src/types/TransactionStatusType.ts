@@ -1,0 +1,1 @@
+export type TransactionStatus = 'paid' | 'unpaid' | 'scheduled';

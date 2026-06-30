@@ -1,29 +1,12 @@
 import { supabase } from '../lib/supabase';
-import { TransactionStatus } from '../components/TransactionStatusPicker';
 import { BalanceDto } from '../dtos/BalanceDto';
-
-// Interface do Payload de cadastro
-export interface CreateTransactionPayload {
-        user_id: string | null;
-        type: 'income' | 'expense';
-        amount: number;
-        description: string;
-        category_id: string | null;
-        date: string;
-        status: TransactionStatus;
-        payment_method_id: string | null;
-        frequency: 'single' | 'installment' | 'fixed' | null;
-        installments?: number;
-        payee?: string;
-        tags?: string[];
-        ignore_in_dashboard: boolean;
-        notes?: string;
-        notify_me: boolean;
-        days_before_notify?: number | null;
-}
+import { CreateTransactionDto } from '../dtos/CreateTransactionDto';
+import { UpdateTransactionDto } from '../dtos/UpdateTransactionDto';
+import { dateUtils } from '../utils/dateUtils';
+import { Transaction } from '../dtos/TransactionDto';
 
 export const transactionService = {
-        async create(payload: CreateTransactionPayload) {
+        async create(payload: CreateTransactionDto) {
                 const { data, error } = await supabase
                         .from('transactions') // Tabela
                         .insert([payload])
@@ -38,7 +21,7 @@ export const transactionService = {
 
         async getTransactions() {
                 const { data, error } = await supabase
-                        .from('transactions') //Tabela
+                        .from('transactions') // Tabela
                         .select(`
                           *,
                                 category:categories!inner(id, name, icon, color),
@@ -49,7 +32,7 @@ export const transactionService = {
                         throw error;
                 }
 
-                return data;
+                return data as Transaction[];
         },
 
         async getActiveTransactionsByMonth(month: number, year: number) {
@@ -99,7 +82,7 @@ export const transactionService = {
                         .from('transactions')
                         .update({
                                 status: 'paid',
-                                updated_at: new Date().toISOString(),
+                                updated_at: dateUtils.now(),
                                 notify_me: false,
                                 days_before_notify: null
                         })
@@ -113,22 +96,12 @@ export const transactionService = {
                 return data ? data[0] : null;
         },
 
-        async update(transactionId: string, payload: CreateTransactionPayload) {
+        async update(transactionId: string, payload: UpdateTransactionDto) {
                 const { data, error } = await supabase
                         .from('transactions')
                         .update({
-                                description: payload.description,
-                                amount: payload.amount,
-                                category_id: payload.category_id,
-                                payment_method_id: payload.payment_method_id,
-                                status: payload.status,
-                                payee: payload.payee,
-                                tags: payload.tags,
-                                ignore_in_dashboard: payload.ignore_in_dashboard,
-                                notes: payload.notes,
-                                notify_me: payload.notify_me,
-                                days_before_notify: payload.days_before_notify,
-                                updated_at: new Date().toISOString() // Registra o momento da alteração
+                                ...payload,
+                                updated_at: dateUtils.now() // Registra o momento da alteração
                         })
                         .eq('id', transactionId)
                         .select();
@@ -144,8 +117,8 @@ export const transactionService = {
                 const { error } = await supabase
                         .from('transactions')
                         .update({
-                                updated_at: new Date().toISOString(),
-                                deleted_at: new Date().toISOString()
+                                updated_at: dateUtils.now(),
+                                deleted_at: dateUtils.now()
                         })
                         .eq('id', transactionId)
 

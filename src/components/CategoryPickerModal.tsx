@@ -1,14 +1,7 @@
 import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
-
-// Tipagem para a Categoria
-export interface Category {
-        id: string;
-        name: string;
-        icon: keyof typeof Ionicons | string;
-        color: string;
-}
+import { Category } from '../dtos/CategoryDto';
 
 interface CategoryPickerModalProps {
         visible: boolean;
