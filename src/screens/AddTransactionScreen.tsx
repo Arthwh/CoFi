@@ -1,214 +1,43 @@
-import { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../theme';
 import { CategoryPickerModal } from '../components/CategoryPickerModal';
-import { TransactionStatusPicker } from '../components/TransactionStatusPicker';
-import { transactionService } from '../services/transactionService';
-import { userService } from '../services/userService';
-import { categoryService } from '../services/categoryService';
-import { paymentMethodService } from '../services/paymentMethodService';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RootStackParamList } from '../types/navigation';
-import { AppToast } from '../utils/toast';
-import { handleError } from '../utils/errorHandler';
-import { TransactionType } from '../types/TransactionTypeType';
-import { TransactionFrequency } from '../types/TransactionFrequencyType';
-import { PaymentMethod } from '../dtos/PaymentMethodDto';
-import { TransactionStatus } from '../types/TransactionStatusType';
-import { Category } from '../dtos/CategoryDto';
-import { UpdateTransactionDto } from '../dtos/UpdateTransactionDto';
-import { CreateTransactionDto } from '../dtos/CreateTransactionDto';
-import { dateUtils } from '../utils/dateUtils';
-import { formatAmountToString } from '../utils/moneyUtils'
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import { TransactionOptionalDataForm } from '../components/TransactionOptionalDataForm';
 import { TransactionPaymentFrequencyDataForm } from '../components/TransactionPaymentFrequencyDataForm';
 import { TransactionNotificationOptionsCard } from '../components/TransactionNotificationOptionsCard';
 import { TransactionBasicDataForm } from '../components/TransactionBasicDataForm';
+import { TransactionStatusAndAmountDataForm } from '../components/TransactionStatusAndAmountDataForm';
+import { useAddEditTransaction } from '../hooks/useAddEditTransaction';
+import { formatTagsFromStringToMap } from '../utils/tagsUtils';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
         const navigation = useNavigation();
 
-        // Captura a movimentação vinda do Modal de Detalhes (se existir)
-        const transactionToEdit = route.params?.transactionToEdit;
-
-        const [isEditing, setIsEditing] = useState(false);
-
-        const [categories, setCategories] = useState<Category[]>([]);
-        const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-        const [userId, setUserId] = useState<string | null>(null);
-        // Dados Principais
-        const [type, setType] = useState<TransactionType>('income');
-        const [amount, setAmount] = useState<string>('0');
-        const [description, setDescription] = useState('');
-        const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-        const [date, setDate] = useState(dateUtils.currentDate());
-
-        // Status e Pagamento
-        const [status, setStatus] = useState<TransactionStatus>('paid');
-        const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
-
-        // Frequência e Parcelamento
-        const [frequency, setFrequency] = useState<TransactionFrequency | null>(null);
-        const [installmentsCount, setInstallmentsCount] = useState('2');
-
-        // Outros dados opcionais
-        const [payee, setPayee] = useState('');
-        const [tags, setTags] = useState('');
-        const [ignoreInDashboard, setIgnoreInDashboard] = useState(false); // Ignorar transferências no dashboard
-        const [notes, setNotes] = useState('');
-
-        // Funcionalidade de notificações
-        const [notifyMe, setNotifyMe] = useState(false);
-        const [daysBeforeNotify, setDaysBeforeNotify] = useState<string | null>(null);
-        const showNotificationOption = status === 'unpaid' || status === 'scheduled' || frequency === 'installment';
-
-        // Controle de Modal
-        const [showCategoryPicker, setShowCategoryPicker] = useState(false);
-        const [showDatePicker, setShowDatePicker] = useState(false);
-
-        const [loading, setLoading] = useState(true);
-
-        useFocusEffect(
-                useCallback(() => {
-                        // Executado quando a tela entra em foco 
-                        return () => {
-                                // Executado quando a tela perde o foco
-                                resetForm();
-                        };
-                }, [])
-        );
-
-        useEffect(() => {
-                loadInitialData();
-        }, []);
-
-        // Atribui os dados para o modo de edição
-        useEffect(() => {
-                if (transactionToEdit && !isEditing) {
-                        setIsEditing(true);
-
-                        setDescription(transactionToEdit.description);
-                        setAmount(transactionToEdit.amount);
-                        setType(transactionToEdit.type);
-                        setSelectedCategory(transactionToEdit.category);
-                        setSelectedPaymentMethod(transactionToEdit.paymentMethod);
-                        setDate(transactionToEdit.date);
-                        setPayee(transactionToEdit.payee || '');
-                        setStatus(transactionToEdit.status);
-                        setFrequency(transactionToEdit.frequency)
-                        setInstallmentsCount(transactionToEdit.installmentsCount)
-                        setTags(transactionToEdit.tags)
-                        setIgnoreInDashboard(transactionToEdit.ignoreInDashboard)
-                        setNotes(transactionToEdit.notes)
-                        setNotifyMe(transactionToEdit.notifyMe)
-                        setDaysBeforeNotify(transactionToEdit.daysBeforeNotify)
-                }
-        }, [transactionToEdit, isEditing]);
-
-        const loadInitialData = async () => {
-                try {
-                        const [userData, categoriesData, paymentMethodsData] = await Promise.all([
-                                userService.getUserProfile(),
-                                categoryService.getCategories(),
-                                paymentMethodService.getPaymentMethods()
-                        ])
-
-                        if (userData) setUserId(userData.id);
-                        if (categoriesData) setCategories(categoriesData);
-                        if (paymentMethodsData) setPaymentMethods(paymentMethodsData);
-                } catch (error: any) {
-                        handleError(error.message, 'Houve um erro ao carregar os dados. Tente novamente mais tarde.');
-                } finally {
-                        setLoading(false);
-                }
-        };
-
-        const handleAmountChange = (text: string) => {
-                // Remove tudo que não for número
-                const cleanNumber = text.replace(/\D/g, '');
-                setAmount(cleanNumber);
-        };
-
-        const handleSaveTransaction = async () => {
-                setLoading(true);
-                const [dia, mes, ano] = date.split('/');
-                const dataFormatada = `${ano}-${mes}-${dia}`;
-
-                try {
-                        if (isEditing) {
-                                const payload: UpdateTransactionDto = {
-                                        description,
-                                        amount: Number(amount),
-                                        category_id: selectedCategory!.id,
-                                        payment_method_id: selectedPaymentMethod!.id,
-                                        status,
-                                        payee,
-                                        tags: tags.split(',').map(t => t.trim()),
-                                        ignore_in_dashboard: ignoreInDashboard,
-                                        notes,
-                                        notify_me: notifyMe,
-                                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
-                                }
-
-                                await transactionService.update(transactionToEdit.id, payload)
-                                AppToast.success('Movimentação atualizada com sucesso!');
-                                // Volta para a tela anterior
-                                navigation.goBack();
-                        }
-                        else {
-                                const payload: CreateTransactionDto = {
-                                        user_id: userId!,
-                                        type,
-                                        amount: Number(amount),
-                                        description,
-                                        category_id: selectedCategory!.id,
-                                        date: dataFormatada,
-                                        status,
-                                        payment_method_id: selectedPaymentMethod!.id,
-                                        frequency: frequency!,
-                                        installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
-                                        payee,
-                                        tags: tags.split(',').map(t => t.trim()),
-                                        ignore_in_dashboard: ignoreInDashboard,
-                                        notes,
-                                        notify_me: notifyMe,
-                                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
-                                };
-                                await transactionService.create(payload);
-                                AppToast.success('Movimentação criada com sucesso!', 'Você pode visualizá-la na aba de listagem.');
-                        }
-                } catch (error: any) {
-                        handleError(error.message, 'Erro ao salvar movimentação');
-                } finally {
-                        resetForm();
-                        setLoading(false);
-                }
-        };
-
-        const resetForm = () => {
-                setType('income');
-                setAmount('0');
-                setDescription('');
-                setSelectedCategory(null);
-                setDate(dateUtils.currentDate());
-                setStatus('paid');
-                setSelectedPaymentMethod(null);
-                setFrequency(null);
-                setInstallmentsCount('2');
-                setPayee('');
-                setTags('');
-                setIgnoreInDashboard(false);
-                setNotes('');
-                setNotifyMe(false);
-                setDaysBeforeNotify(null);
-
-                setIsEditing(false)
-                navigation.setParams({ transactionToEdit: undefined });
-        };
+        const {
+                // Estados de Controle da Tela e Loading
+                loading, isEditing, showCategoryPicker, setShowCategoryPicker, showDatePicker, setShowDatePicker,
+                // Dados Externos
+                categories, paymentMethods,
+                // Estados do Formulário e Handlers
+                type, setType, amount, handleAmountChange, description, setDescription,
+                selectedCategory, setSelectedCategory, date, setDate, status, setStatus,
+                selectedPaymentMethod, setSelectedPaymentMethod, frequency, setFrequency,
+                installmentsCount, setInstallmentsCount, payee, setPayee, tags, setTags,
+                ignoreInDashboard, setIgnoreInDashboard,
+                // Notificações
+                notifyMe, setNotifyMe, daysBeforeNotify,
+                setDaysBeforeNotify, showNotificationOption,
+                // Ação Principal
+                handleSaveTransaction
+        } = useAddEditTransaction({
+                route,
+                navigation
+        });
 
         if (loading) {
                 return <LoadingIndicator message="Carregando..." />;
@@ -224,15 +53,12 @@ export default function AddTransactionScreen() {
                                 <TransactionTypePicker type={type} onPress={setType} />
 
                                 {/* Valor e Status */}
-                                <View style={[styles.card, styles.shadow, styles.amountCard]}>
-                                        <Text style={styles.inputLabelLabel}>Valor da Transação</Text>
-                                        <View style={styles.amountInputContainer}>
-                                                <Text style={styles.currencyPrefix}>R$</Text>
-                                                <TextInput style={styles.amountInput} placeholderTextColor={theme.colors.placeholder} keyboardType="numeric" value={formatAmountToString(amount)} onChangeText={handleAmountChange} />
-                                        </View>
-
-                                        <TransactionStatusPicker status={status} onChange={setStatus} isExpense={type === 'expense'} />
-                                </View>
+                                <TransactionStatusAndAmountDataForm
+                                        amount={amount}
+                                        status={status}
+                                        type={type}
+                                        handleAmountChange={handleAmountChange}
+                                        setStatus={setStatus} />
 
                                 {/* Opção de notificação */}
                                 {showNotificationOption && (
@@ -271,7 +97,9 @@ export default function AddTransactionScreen() {
                                         tags={tags}
                                         ignoreInDashboard={ignoreInDashboard}
                                         setPayee={setPayee}
-                                        setTags={setTags}
+                                        setTags={(tags) => {
+                                                setTags(formatTagsFromStringToMap(tags))
+                                        }}
                                         setIgnoreInDashboard={setIgnoreInDashboard}
                                 />
 

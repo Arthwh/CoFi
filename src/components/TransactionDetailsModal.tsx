@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, Modal, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
+import { Transaction } from '../dtos/TransactionDto';
 
 interface TransactionDetailsModalProps {
         visible: boolean;
-        transaction: any | null;
+        transaction: Transaction | null;
         onClose: () => void;
         onMarkAsPaid: (id: string) => void;
         onDelete: (id: string) => void;
@@ -31,7 +32,7 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                         {/* Cabeçalho do Modal */}
                                         <View style={styles.header}>
                                                 <View style={[styles.bigIconBg, { backgroundColor: transaction.category.color + '20' }]}>
-                                                        <Ionicons name={transaction.category.icon} size={32} color={transaction.category.color} />
+                                                        <Ionicons name={transaction.category.icon as React.ComponentProps<typeof Ionicons>['name']} size={32} color={transaction.category.color} />
                                                 </View>
                                                 <Text style={styles.description}>{transaction.description}</Text>
                                                 <Text style={[styles.amount, { color: isIncome ? '#10B981' : theme.colors.text }]}>
@@ -52,7 +53,7 @@ export function TransactionDetailsModal({ visible, transaction, onClose, onMarkA
                                         <View style={styles.detailsList}>
                                                 <DetailRow label="Data" value={transaction.date} icon="calendar-outline" />
                                                 <DetailRow label="Categoria" value={transaction.category.name} icon="grid-outline" />
-                                                <DetailRow label="Método" value={transaction.paymentMethod.name} icon="wallet-outline" />
+                                                <DetailRow label="Método" value={transaction.payment_method.name} icon="wallet-outline" />
                                                 {transaction.payee && <DetailRow label="Local / Pessoa" value={transaction.payee} icon="person-outline" />}
                                         </View>
 

@@ -1,12 +1,13 @@
 import { View, Text, TextInput, Switch, StyleSheet } from "react-native";
 import { theme } from "../theme";
+import { formatTagsFromMapToString } from "../utils/tagsUtils";
 
 interface TransactionOptionalDataFormProps {
-        payee: string,
-        tags: string,
+        payee: string | null,
+        tags: string[] | null,
         ignoreInDashboard: boolean,
         setPayee: (payee: string) => void,
-        setTags: (toastConfig: string) => void,
+        setTags: (tags: string) => void,
         setIgnoreInDashboard: (ignoreInDashboard: boolean) => void,
 }
 
@@ -17,13 +18,13 @@ export function TransactionOptionalDataForm({ payee, tags, ignoreInDashboard, se
 
                         <View style={styles.inputGroup}>
                                 <Text style={styles.inputLabel}>Local / Beneficiário</Text>
-                                <TextInput style={styles.input} placeholder="Ex: Padaria do Zé, Maria Silva..." placeholderTextColor={theme.colors.placeholder} value={payee} onChangeText={setPayee} />
+                                <TextInput style={styles.input} placeholder="Ex: Padaria do Zé, Maria Silva..." placeholderTextColor={theme.colors.placeholder} value={payee ? payee : ''} onChangeText={setPayee} />
                         </View>
                         <View style={styles.divider} />
 
                         <View style={styles.inputGroup}>
                                 <Text style={styles.inputLabel}>Tags (separadas por vírgula)</Text>
-                                <TextInput style={styles.input} placeholder="Ex: viagem, carro, emergencia" placeholderTextColor={theme.colors.placeholder} value={tags} onChangeText={setTags} />
+                                <TextInput style={styles.input} placeholder="Ex: viagem, carro, emergencia" placeholderTextColor={theme.colors.placeholder} value={tags ? formatTagsFromMapToString(tags) : ''} onChangeText={setTags} />
                         </View>
                         <View style={styles.divider} />
 

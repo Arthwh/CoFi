@@ -25,7 +25,7 @@ export const transactionService = {
                         .select(`
                           *,
                                 category:categories!inner(id, name, icon, color),
-                                paymentMethod:payment_methods!inner(id, name, icon, color)
+                                payment_method:payment_methods!inner(id, name, icon, color)
                         `);
 
                 if (error) {
@@ -46,7 +46,7 @@ export const transactionService = {
                         .select(`
                                 *,
                                 category:categories!inner(id, name, icon, color),
-                                paymentMethod:payment_methods!inner(id, name, icon, color)
+                                payment_method:payment_methods!inner(id, name, icon, color)
                         `)
                         .is('deleted_at', null)
                         .gte('date', firstDay)
@@ -57,7 +57,7 @@ export const transactionService = {
                         throw error;
                 }
 
-                return data;
+                return data as Transaction[];
         },
 
         async getBalance(userId: string) {
@@ -74,7 +74,7 @@ export const transactionService = {
                         throw error;
                 }
 
-                return data as BalanceDto;
+                return data[0] as BalanceDto;
         },
 
         async markTransactionAsPaid(transactionId: string) {

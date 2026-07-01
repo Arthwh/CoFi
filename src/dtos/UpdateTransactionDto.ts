@@ -9,7 +9,6 @@ export interface UpdateTransactionDto {
         payee: string | null;
         tags: string[] | null;
         ignore_in_dashboard: boolean;
-        notes: string | null;
         notify_me: boolean;
         days_before_notify: number | null;
 }

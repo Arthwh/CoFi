@@ -1,86 +1,96 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigation';
-import { userService } from '../services/userService';
-import { categoryService } from '../services/categoryService';
-import { paymentMethodService } from '../services/paymentMethodService';
-import { transactionService } from '../services/transactionService';
-import { AppToast } from '../utils/toast';
-import { handleError } from '../utils/errorHandler';
-import { Category } from '../dtos/CategoryDto';
-import { PaymentMethod } from '../dtos/PaymentMethodDto';
-import { TransactionType } from '../types/TransactionTypeType';
-import { TransactionStatus } from '../types/TransactionStatusType';
-import { TransactionFrequency } from '../types/TransactionFrequencyType';
-import { UpdateTransactionDto } from '../dtos/UpdateTransactionDto';
-import { CreateTransactionDto } from '../dtos/CreateTransactionDto';
+import { useCallback, useEffect, useState } from "react";
+import { NavigationProp, NavigationState, RouteProp, useFocusEffect } from "@react-navigation/native";
 
-export function useAddTransaction() {
-        const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
-        const navigation = useNavigation();
+import { CreateTransactionDto } from "../dtos/CreateTransactionDto";
+import { UpdateTransactionDto } from "../dtos/UpdateTransactionDto";
+import { PaymentMethod } from "../dtos/PaymentMethodDto";
+import { Category } from "../dtos/CategoryDto";
+import { categoryService } from "../services/categoryService";
+import { paymentMethodService } from "../services/paymentMethodService";
+import { transactionService } from "../services/transactionService";
+import { userService } from "../services/userService";
+import { dateUtils } from "../utils/dateUtils";
+import { handleError } from "../utils/errorHandler";
+import { AppToast } from "../utils/toast";
+import { TransactionFrequency } from "../types/TransactionFrequencyType";
+import { TransactionStatus } from "../types/TransactionStatusType";
+import { TransactionType } from "../types/TransactionTypeType";
+import { RootStackParamList } from "../types/navigation";
+import { formatTagsFromMapToString, formatTagsFromStringToMap } from "../utils/tagsUtils";
+
+interface useAddEditTransactionProps {
+        route: RouteProp<RootStackParamList, "Adicionar">
+        navigation: Omit<NavigationProp<ReactNavigation.RootParamList>, "getState"> & {
+                getState(): NavigationState | undefined
+        }
+}
+
+export function useAddEditTransaction({ route, navigation }: useAddEditTransactionProps) {
         const transactionToEdit = route.params?.transactionToEdit;
 
-        // Estados de Controle da UI
-        const [loading, setLoading] = useState(true);
         const [isEditing, setIsEditing] = useState(false);
-        const [modalVisible, setModalVisible] = useState(false);
 
-        // Estados de Dados Externos
         const [categories, setCategories] = useState<Category[]>([]);
         const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
         const [userId, setUserId] = useState<string | null>(null);
-
-        // Estados do Formulário
+        // Dados Principais
         const [type, setType] = useState<TransactionType>('income');
-        const [amount, setAmount] = useState('');
+        const [amount, setAmount] = useState<string>('0');
         const [description, setDescription] = useState('');
         const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-        const [date, setDate] = useState(new Date().toLocaleDateString('pt-BR'));
+        const [date, setDate] = useState(dateUtils.currentDate());
+        // Status e Pagamento
         const [status, setStatus] = useState<TransactionStatus>('paid');
         const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+        // Frequência e Parcelamento
         const [frequency, setFrequency] = useState<TransactionFrequency | null>(null);
         const [installmentsCount, setInstallmentsCount] = useState('2');
-        const [payee, setPayee] = useState('');
-        const [tags, setTags] = useState('');
-        const [ignoreInDashboard, setIgnoreInDashboard] = useState(false);
-        const [notes, setNotes] = useState('');
+        // Outros dados opcionais
+        const [payee, setPayee] = useState<string | null>(null);
+        const [tags, setTags] = useState<string[] | null>(null);
+        const [ignoreInDashboard, setIgnoreInDashboard] = useState(false); // Ignorar transferências no dashboard
+        // Funcionalidade de notificações
         const [notifyMe, setNotifyMe] = useState(false);
         const [daysBeforeNotify, setDaysBeforeNotify] = useState<string | null>(null);
-
-        // Estado Derivado (Não precisa de useState, pois calcula baseado em outros estados)
         const showNotificationOption = status === 'unpaid' || status === 'scheduled' || frequency === 'installment';
+        // Controle de Modal
+        const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+        const [showDatePicker, setShowDatePicker] = useState(false);
+        const [loading, setLoading] = useState(true);
 
-        // Limpa o formulário ao sair da tela
         useFocusEffect(
                 useCallback(() => {
-                        return () => resetForm();
+                        // Executado quando a tela entra em foco 
+                        return () => {
+                                // Executado quando a tela perde o foco
+                                resetForm();
+                        };
                 }, [])
         );
 
-        // Carrega dados iniciais do banco
         useEffect(() => {
                 loadInitialData();
         }, []);
 
-        // Preenche os campos se for modo de edição
+        // Atribui os dados para o modo de edição
         useEffect(() => {
                 if (transactionToEdit && !isEditing) {
+                        console.log(transactionToEdit)
                         setIsEditing(true);
                         setDescription(transactionToEdit.description);
                         setAmount(String(transactionToEdit.amount));
                         setType(transactionToEdit.type);
                         setSelectedCategory(transactionToEdit.category);
-                        setSelectedPaymentMethod(transactionToEdit.paymentMethod);
+                        setSelectedPaymentMethod(transactionToEdit.payment_method);
                         setDate(transactionToEdit.date);
-                        setPayee(transactionToEdit.payee || '');
+                        setPayee(transactionToEdit.payee);
                         setStatus(transactionToEdit.status);
-                        setFrequency(transactionToEdit.frequency);
-                        setInstallmentsCount(transactionToEdit.installmentsCount);
-                        setTags(transactionToEdit.tags);
-                        setIgnoreInDashboard(transactionToEdit.ignoreInDashboard);
-                        setNotes(transactionToEdit.notes);
-                        setNotifyMe(transactionToEdit.notifyMe);
-                        setDaysBeforeNotify(transactionToEdit.daysBeforeNotify);
+                        setFrequency(transactionToEdit.frequency)
+                        setInstallmentsCount(transactionToEdit.installments)
+                        setTags(transactionToEdit.tags)
+                        setIgnoreInDashboard(transactionToEdit.ignore_in_dashboard)
+                        setNotifyMe(transactionToEdit.notify_me)
+                        setDaysBeforeNotify(transactionToEdit.days_before_notify)
                 }
         }, [transactionToEdit, isEditing]);
 
@@ -89,8 +99,8 @@ export function useAddTransaction() {
                         const [userData, categoriesData, paymentMethodsData] = await Promise.all([
                                 userService.getUserProfile(),
                                 categoryService.getCategories(),
-                                paymentMethodService.getPaymentMethods(),
-                        ]);
+                                paymentMethodService.getPaymentMethods()
+                        ])
 
                         if (userData) setUserId(userData.id);
                         if (categoriesData) setCategories(categoriesData);
@@ -102,51 +112,24 @@ export function useAddTransaction() {
                 }
         };
 
+        const handleAmountChange = (text: string) => {
+                // Remove tudo que não for número
+                const cleanNumber = text.replace(/\D/g, '');
+                setAmount(cleanNumber);
+        };
+
         const handleSaveTransaction = async () => {
                 setLoading(true);
-                const [dia, mes, ano] = date.split('/');
-                const dataFormatada = `${ano}-${mes}-${dia}`;
-                const parsedAmount = parseFloat(amount.replace(',', '.'));
-
                 try {
                         if (isEditing) {
-                                const payload: UpdateTransactionDto = {
-                                        description,
-                                        amount: parsedAmount,
-                                        category_id: selectedCategory!.id,
-                                        payment_method_id: selectedPaymentMethod!.id,
-                                        status,
-                                        payee,
-                                        tags: tags.split(',').map((t) => t.trim()),
-                                        ignore_in_dashboard: ignoreInDashboard,
-                                        notes,
-                                        notify_me: notifyMe,
-                                        days_before_notify: notifyMe && daysBeforeNotify ? parseInt(daysBeforeNotify) : null,
-                                };
-
-                                await transactionService.update(transactionToEdit.id, payload);
+                                const payload: UpdateTransactionDto = getUpdateTransactionPayload();
+                                await transactionService.update(transactionToEdit.id, payload)
                                 AppToast.success('Movimentação atualizada com sucesso!');
+                                // Volta para a tela anterior
                                 navigation.goBack();
-                        } else {
-                                const payload: CreateTransactionDto = {
-                                        user_id: userId!,
-                                        type,
-                                        amount: parsedAmount,
-                                        description,
-                                        category_id: selectedCategory!.id,
-                                        date: dataFormatada,
-                                        status,
-                                        payment_method_id: selectedPaymentMethod!.id,
-                                        frequency: frequency!,
-                                        installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
-                                        payee,
-                                        tags: tags.split(',').map((t) => t.trim()),
-                                        ignore_in_dashboard: ignoreInDashboard,
-                                        notes,
-                                        notify_me: notifyMe,
-                                        days_before_notify: notifyMe && daysBeforeNotify ? parseInt(daysBeforeNotify) : null,
-                                };
-
+                        }
+                        else {
+                                const payload: CreateTransactionDto = getCreateTransactionPayload();
                                 await transactionService.create(payload);
                                 AppToast.success('Movimentação criada com sucesso!', 'Você pode visualizá-la na aba de listagem.');
                         }
@@ -158,38 +141,78 @@ export function useAddTransaction() {
                 }
         };
 
+        const getCreateTransactionPayload = () => {
+                return {
+                        user_id: userId!,
+                        type,
+                        amount: Number(amount),
+                        description,
+                        category_id: selectedCategory!.id,
+                        date: dateUtils.formatDateFromSlashToDash(date),
+                        status,
+                        payment_method_id: selectedPaymentMethod!.id,
+                        frequency: frequency!,
+                        installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
+                        payee: payee ? payee : null,
+                        tags: tags ? tags : null,
+                        ignore_in_dashboard: ignoreInDashboard,
+                        notify_me: notifyMe,
+                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
+                } as CreateTransactionDto;
+        };
+
+        const getUpdateTransactionPayload = () => {
+                return {
+                        description,
+                        amount: Number(amount),
+                        category_id: selectedCategory!.id,
+                        payment_method_id: selectedPaymentMethod!.id,
+                        status,
+                        payee: payee ? payee : null,
+                        tags: tags ? tags : null,
+                        ignore_in_dashboard: ignoreInDashboard,
+                        notify_me: notifyMe,
+                        days_before_notify: notifyMe === true && daysBeforeNotify ? parseInt(daysBeforeNotify) : null
+                } as UpdateTransactionDto
+        };
+
         const resetForm = () => {
                 setType('income');
-                setAmount('');
+                setAmount('0');
                 setDescription('');
                 setSelectedCategory(null);
-                setDate(new Date().toLocaleDateString('pt-BR'));
+                setDate(dateUtils.currentDate());
                 setStatus('paid');
                 setSelectedPaymentMethod(null);
                 setFrequency(null);
                 setInstallmentsCount('2');
-                setPayee('');
-                setTags('');
+                setPayee(null);
+                setTags(null);
                 setIgnoreInDashboard(false);
-                setNotes('');
                 setNotifyMe(false);
                 setDaysBeforeNotify(null);
-                setIsEditing(false);
+                setIsEditing(false)
                 navigation.setParams({ transactionToEdit: undefined });
         };
 
-        // Retornamos tudo o que a View vai precisar ler ou modificar
         return {
+                // Estados de Controle da Tela e Loading
                 loading,
                 isEditing,
-                modalVisible,
-                setModalVisible,
+                showCategoryPicker,
+                setShowCategoryPicker,
+                showDatePicker,
+                setShowDatePicker,
+
+                // Dados Externos
                 categories,
                 paymentMethods,
+
+                // Estados do Formulário e Handlers
                 type,
                 setType,
                 amount,
-                setAmount,
+                handleAmountChange,
                 description,
                 setDescription,
                 selectedCategory,
@@ -210,13 +233,15 @@ export function useAddTransaction() {
                 setTags,
                 ignoreInDashboard,
                 setIgnoreInDashboard,
-                notes,
-                setNotes,
+
+                // Notificações
                 notifyMe,
                 setNotifyMe,
                 daysBeforeNotify,
                 setDaysBeforeNotify,
                 showNotificationOption,
-                handleSaveTransaction,
+
+                // Ação Principal
+                handleSaveTransaction
         };
 }

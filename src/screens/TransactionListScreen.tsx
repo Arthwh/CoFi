@@ -158,6 +158,7 @@ export default function TransactionsListScreen() {
                                         // Renderiza o Card de Movimentação
                                         renderItem={({ item }) => {
                                                 const isIncome = item.type === 'income';
+                                                console.log(item)
                                                 return (
                                                         <TouchableOpacity style={styles.card} onPress={() => setSelectedTransaction(item)}>
                                                                 <View style={[styles.iconContainer, { backgroundColor: item.category.color + '15' }]}>

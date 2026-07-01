@@ -15,13 +15,12 @@ export interface Transaction {
         date: string;
         status: TransactionStatus;
         payment_method_id: string;
-        paymentMethod: PaymentMethod;
+        payment_method: PaymentMethod;
         frequency: TransactionFrequency;
         installments: number | null;
         payee: string | null;
         tags: string[] | null;
         ignore_in_dashboard: boolean;
-        notes: string | null;
         notify_me: boolean;
         days_before_notify: number | null;
         created_at: string;

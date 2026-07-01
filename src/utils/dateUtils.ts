@@ -56,7 +56,7 @@ export const dateUtils = {
                 return new Date().toISOString()
         },
 
-        currentDate(){
+        currentDate() {
                 return new Date().toLocaleDateString('pt-BR')
         },
 
@@ -67,5 +67,10 @@ export const dateUtils = {
         //Formata YYYY-MM-DD para DD/MM/YYYY 
         formatDateFromDashToSlash(data: string) {
                 return data.split('-').reverse().join('/')
+        },
+
+        //Formata DD/MM/YYYY para YYYY-MM-DD  
+        formatDateFromSlashToDash(data: string) {
+                return data.split('/').reverse().join('-')
         }
 }
