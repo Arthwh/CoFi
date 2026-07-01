@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Switch } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../theme';
 import { CategoryPickerModal } from '../components/CategoryPickerModal';
 import { TransactionStatusPicker } from '../components/TransactionStatusPicker';
@@ -27,6 +26,7 @@ import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import { TransactionOptionalDataForm } from '../components/TransactionOptionalDataForm';
 import { TransactionPaymentFrequencyDataForm } from '../components/TransactionPaymentFrequencyDataForm';
 import { TransactionNotificationOptionsCard } from '../components/TransactionNotificationOptionsCard';
+import { TransactionBasicDataForm } from '../components/TransactionBasicDataForm';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
@@ -67,7 +67,7 @@ export default function AddTransactionScreen() {
         const showNotificationOption = status === 'unpaid' || status === 'scheduled' || frequency === 'installment';
 
         // Controle de Modal
-        const [modalVisible, setModalVisible] = useState(false);
+        const [showCategoryPicker, setShowCategoryPicker] = useState(false);
         const [showDatePicker, setShowDatePicker] = useState(false);
 
         const [loading, setLoading] = useState(true);
@@ -245,38 +245,20 @@ export default function AddTransactionScreen() {
                                 )}
 
                                 {/* Dados Básicos */}
-                                <View style={[styles.card, styles.shadow]}>
-                                        <View style={styles.inputGroup}>
-                                                <Text style={styles.inputLabel}>Descrição</Text>
-                                                <TextInput style={styles.input} placeholder="Ex: Supermercado" placeholderTextColor={theme.colors.placeholder} value={description} onChangeText={setDescription} />
-                                        </View>
-                                        <View style={styles.divider} />
-                                        <View style={styles.inputGroup}>
-                                                <Text style={styles.inputLabel}>Categoria</Text>
-                                                <TouchableOpacity style={styles.selectRow} onPress={() => setModalVisible(true)}>
-                                                        <Text style={selectedCategory ? styles.selectRowTextActive : styles.selectRowTextPlaceholder}>
-                                                                {selectedCategory ? selectedCategory.name : 'Selecione uma categoria'}
-                                                        </Text>
-                                                        <Ionicons name="chevron-forward" size={18} color={theme.colors.textLight} />
-                                                </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.divider} />
-                                        <View style={styles.inputGroup}>
-                                                <Text style={styles.inputLabel}>Data</Text>
-                                                <View style={styles.selectRow}>
-                                                        <TouchableOpacity style={styles.selectRow} onPress={() => setShowDatePicker(true)}>
-                                                                <Text style={styles.inputClean}>{date}</Text>
-                                                                <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} />
-                                                        </TouchableOpacity>
-                                                </View>
-                                        </View>
-                                </View>
+                                <TransactionBasicDataForm
+                                        description={description}
+                                        selectedCategory={selectedCategory!}
+                                        date={date}
+                                        setDescription={setDescription}
+                                        setShowCategoryPicker={setShowCategoryPicker}
+                                        setShowDatePicker={setShowDatePicker}
+                                />
 
                                 {/* Pagamento e Frequência */}
                                 <TransactionPaymentFrequencyDataForm
                                         paymentMethods={paymentMethods}
-                                        selectedPaymentMethod={selectedPaymentMethod}
-                                        frequency={frequency}
+                                        selectedPaymentMethod={selectedPaymentMethod!}
+                                        frequency={frequency!}
                                         installmentsCount={installmentsCount}
                                         setSelectedPaymentMethod={setSelectedPaymentMethod}
                                         setFrequency={setFrequency}
@@ -296,12 +278,11 @@ export default function AddTransactionScreen() {
                                 <TouchableOpacity style={[styles.submitButton, styles.shadow]} onPress={handleSaveTransaction}>
                                         <Text style={styles.submitButtonText}>{isEditing ? 'Salvar Alterações' : 'Confirmar Movimentação'}</Text>
                                 </TouchableOpacity>
-
                         </ScrollView>
 
                         <CategoryPickerModal
-                                visible={modalVisible}
-                                onClose={() => setModalVisible(false)}
+                                visible={showCategoryPicker}
+                                onClose={() => setShowCategoryPicker(false)}
                                 categories={categories!}
                                 onSelectCategory={setSelectedCategory}
                         />
@@ -318,6 +299,7 @@ export default function AddTransactionScreen() {
                                                         setDate(selectedDate.toLocaleDateString('pt-BR'));
                                                 }
                                         }}
+                                        onDismiss={() => setShowDatePicker(false)}
                                 />
                         )}
                 </SafeAreaView>

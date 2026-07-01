@@ -6,8 +6,8 @@ import { TransactionFrequency } from "../types/TransactionFrequencyType";
 
 interface TransactionPaymentFrequencyDataFormProps {
         paymentMethods: PaymentMethod[],
-        selectedPaymentMethod: PaymentMethod | null,
-        frequency: TransactionFrequency | null,
+        selectedPaymentMethod: PaymentMethod,
+        frequency: TransactionFrequency,
         installmentsCount: string, 
         setSelectedPaymentMethod: (selectedPaymentMethod: PaymentMethod) => void,
         setFrequency: (frequency: TransactionFrequency) => void,
