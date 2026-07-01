@@ -311,47 +311,12 @@ const styles = StyleSheet.create({
         content: { padding: 24, paddingBottom: 120 },
         shadow: { shadowColor: theme.colors.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
         headerTitle: { fontSize: 28, fontWeight: 'bold', color: theme.colors.text, marginBottom: 24 },
-
-        modernIncomeActive: { backgroundColor: '#10B98110', borderColor: '#10B981' },
-        modernExpenseActive: { backgroundColor: '#EF444410', borderColor: '#EF4444' },
-        textIncome: { color: '#10B981' },
-        textExpense: { color: '#EF4444' },
-        textWhite: { color: '#FFF' },
-
-        incomeActive: { backgroundColor: theme.colors.success, borderColor: theme.colors.success },
-        expenseActive: { backgroundColor: theme.colors.danger, borderColor: theme.colors.danger },
-
         card: { backgroundColor: theme.colors.surface, borderRadius: 24, padding: 20, marginBottom: 20 },
         amountCard: { alignItems: 'center', paddingVertical: 24 },
         inputLabelLabel: { fontSize: 14, color: theme.colors.textLight, fontWeight: '500', marginBottom: 8 },
         amountInputContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
         currencyPrefix: { fontSize: 28, fontWeight: 'bold', color: theme.colors.text, marginRight: 6, marginTop: 4 },
         amountInput: { fontSize: 42, fontWeight: 'bold', color: theme.colors.text, minWidth: 150, textAlign: 'left' },
-
-        inputGroup: { paddingVertical: 4 },
-        inputLabel: { fontSize: 13, color: theme.colors.textLight, fontWeight: '600', marginBottom: 6, textTransform: 'uppercase' },
-        input: { fontSize: 16, color: theme.colors.text, paddingVertical: 6 },
-        inputClean: { fontSize: 16, color: theme.colors.text, flex: 1, padding: 0 },
-        divider: { height: 1, backgroundColor: 'rgba(0,0,0,0.05)', marginVertical: 12 },
-
-        selectRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
-        selectRowTextPlaceholder: { fontSize: 16, color: 'rgba(0,0,0,0.25)' },
-        selectRowTextActive: { fontSize: 16, fontWeight: '600', color: theme.colors.text },
-
-        sectionTitle: { fontSize: 16, fontWeight: 'bold', color: theme.colors.text, marginBottom: 16 },
-        switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 },
-        switchTitle: { fontSize: 15, fontWeight: '600', color: theme.colors.text, marginBottom: 4 },
-        switchDesc: { fontSize: 13, color: theme.colors.textLight },
-
         submitButton: { backgroundColor: theme.colors.primary, borderRadius: 20, paddingVertical: 18, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
         submitButtonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
-
-        // Estilos do Card de Notificação
-        notificationIconBg: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#3B82F615', justifyContent: 'center', alignItems: 'center' },
-        daysBeforeNotifyContainer: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' },
-        daysBeforeNotifyLabel: { fontSize: 13, fontWeight: '600', color: theme.colors.text, marginBottom: 10 },
-        daysRow: { flexDirection: 'row', gap: 8 },
-        dayChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: theme.colors.background, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' },
-        dayChipActive: { backgroundColor: '#3B82F6', borderColor: '#3B82F6' },
-        dayChipText: { fontSize: 13, fontWeight: '600', color: theme.colors.textLight },
 });
