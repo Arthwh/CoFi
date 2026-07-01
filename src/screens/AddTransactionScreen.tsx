@@ -25,6 +25,7 @@ import { CreateTransactionDto } from '../dtos/CreateTransactionDto';
 import { dateUtils } from '../utils/dateUtils';
 import { formatAmountToString } from '../utils/moneyUtils'
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
+import { TransactionOptionalDataForm } from '../components/TransactionOptionalDataForm';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
@@ -335,29 +336,15 @@ export default function AddTransactionScreen() {
                                 </View>
 
                                 {/* Dados Opcionais */}
-                                <View style={[styles.card, styles.shadow]}>
-                                        <Text style={styles.sectionTitle}>Detalhes Adicionais (Opcional)</Text>
 
-                                        <View style={styles.inputGroup}>
-                                                <Text style={styles.inputLabel}>Local / Beneficiário</Text>
-                                                <TextInput style={styles.input} placeholder="Ex: Padaria do Zé, Maria Silva..." placeholderTextColor={theme.colors.placeholder} value={payee} onChangeText={setPayee} />
-                                        </View>
-                                        <View style={styles.divider} />
-
-                                        <View style={styles.inputGroup}>
-                                                <Text style={styles.inputLabel}>Tags (separadas por vírgula)</Text>
-                                                <TextInput style={styles.input} placeholder="Ex: viagem, carro, emergencia" placeholderTextColor={theme.colors.placeholder} value={tags} onChangeText={setTags} />
-                                        </View>
-                                        <View style={styles.divider} />
-
-                                        <View style={styles.switchRow}>
-                                                <View style={{ flex: 1 }}>
-                                                        <Text style={styles.switchTitle}>Ignorar nos Gráficos</Text>
-                                                        <Text style={styles.switchDesc}>Não somar essa transação no dashboard</Text>
-                                                </View>
-                                                <Switch value={ignoreInDashboard} onValueChange={setIgnoreInDashboard} trackColor={{ true: theme.colors.primary, false: '#e5e7eb' }} />
-                                        </View>
-                                </View>
+                                <TransactionOptionalDataForm
+                                        payee={payee} 
+                                        tags={tags} 
+                                        ignoreInDashboard={ignoreInDashboard} 
+                                        setPayee={setPayee} 
+                                        setTags={setTags} 
+                                        setIgnoreInDashboard={setIgnoreInDashboard}
+                                />
 
                                 <TouchableOpacity style={[styles.submitButton, styles.shadow]} onPress={handleSaveTransaction}>
                                         <Text style={styles.submitButtonText}>{isEditing ? 'Salvar Alterações' : 'Confirmar Movimentação'}</Text>
@@ -391,26 +378,11 @@ const styles = StyleSheet.create({
         shadow: { shadowColor: theme.colors.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
         headerTitle: { fontSize: 28, fontWeight: 'bold', color: theme.colors.text, marginBottom: 24 },
 
-        typeSelectorRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-        typeButton: {
-                flex: 1,
-                flexDirection: 'row',
-                height: 50,
-                backgroundColor: theme.colors.surface,
-                borderRadius: 16,
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 8,
-                borderWidth: 1,
-                borderColor: 'rgba(0,0,0,0.05)'
-        },
-        typeButtonText: { fontSize: 15, fontWeight: '700', color: theme.colors.textLight },
         modernIncomeActive: { backgroundColor: '#10B98110', borderColor: '#10B981' },
         modernExpenseActive: { backgroundColor: '#EF444410', borderColor: '#EF4444' },
         textIncome: { color: '#10B981' },
         textExpense: { color: '#EF4444' },
         textWhite: { color: '#FFF' },
-
 
         incomeActive: { backgroundColor: theme.colors.success, borderColor: theme.colors.success },
         expenseActive: { backgroundColor: theme.colors.danger, borderColor: theme.colors.danger },
