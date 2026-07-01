@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { CategoryPickerModal } from '../components/CategoryPickerModal';
 import { TransactionStatusPicker } from '../components/TransactionStatusPicker';
-import { PaymentMethodPicker } from '../components/PaymentMethodPicker';
 import { transactionService } from '../services/transactionService';
 import { userService } from '../services/userService';
 import { categoryService } from '../services/categoryService';
@@ -27,6 +26,7 @@ import { formatAmountToString } from '../utils/moneyUtils'
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import { TransactionOptionalDataForm } from '../components/TransactionOptionalDataForm';
 import { TransactionPaymentFrequencyDataForm } from '../components/TransactionPaymentFrequencyDataForm';
+import { TransactionNotificationOptionsCard } from '../components/TransactionNotificationOptionsCard';
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();
@@ -63,7 +63,7 @@ export default function AddTransactionScreen() {
 
         // Funcionalidade de notificações
         const [notifyMe, setNotifyMe] = useState(false);
-        const [daysBeforeNotify, setDaysBeforeNotify] = useState<string | null>(null); // Quantos dias antes avisar
+        const [daysBeforeNotify, setDaysBeforeNotify] = useState<string | null>(null);
         const showNotificationOption = status === 'unpaid' || status === 'scheduled' || frequency === 'installment';
 
         // Controle de Modal
@@ -236,41 +236,12 @@ export default function AddTransactionScreen() {
 
                                 {/* Opção de notificação */}
                                 {showNotificationOption && (
-                                        <View style={[styles.card, styles.shadow, { borderColor: '#3B82F630', borderWidth: 1 }]}>
-                                                <View style={styles.switchRow}>
-                                                        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                                                <View style={styles.notificationIconBg}>
-                                                                        <Ionicons name="notifications" size={20} color="#3B82F6" />
-                                                                </View>
-                                                                <View style={{ flex: 1 }}>
-                                                                        <Text style={styles.switchTitle}>Lembrete de Vencimento</Text>
-                                                                        <Text style={styles.switchDesc}>Me avise antes desta conta vencer</Text>
-                                                                </View>
-                                                        </View>
-                                                        <Switch
-                                                                value={notifyMe}
-                                                                onValueChange={setNotifyMe}
-                                                                trackColor={{ true: '#3B82F6', false: '#e5e7eb' }}
-                                                        />
-                                                </View>
-
-                                                {notifyMe && (
-                                                        <View style={styles.daysBeforeNotifyContainer}>
-                                                                <Text style={styles.daysBeforeNotifyLabel}>Avisar quantos dias antes?</Text>
-                                                                <View style={styles.daysRow}>
-                                                                        {['1', '3', '5'].map((day) => (
-                                                                                <TouchableOpacity
-                                                                                        key={day}
-                                                                                        style={[styles.dayChip, daysBeforeNotify === day && styles.dayChipActive]}
-                                                                                        onPress={() => setDaysBeforeNotify(day)}
-                                                                                >
-                                                                                        <Text style={[styles.dayChipText, daysBeforeNotify === day && styles.textWhite]}>{day} {day === '1' ? 'dia' : 'dias'}</Text>
-                                                                                </TouchableOpacity>
-                                                                        ))}
-                                                                </View>
-                                                        </View>
-                                                )}
-                                        </View>
+                                        <TransactionNotificationOptionsCard
+                                                notifyMe={notifyMe}
+                                                daysBeforeNotify={daysBeforeNotify}
+                                                setNotifyMe={setNotifyMe}
+                                                setDaysBeforeNotify={setDaysBeforeNotify}
+                                        />
                                 )}
 
                                 {/* Dados Básicos */}
@@ -297,8 +268,6 @@ export default function AddTransactionScreen() {
                                                                 <Text style={styles.inputClean}>{date}</Text>
                                                                 <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} />
                                                         </TouchableOpacity>
-                                                        {/* <TextInput style={styles.inputClean} value={date} onChangeText={setDate} placeholder="DD/MM/AAAA" placeholderTextColor={theme.colors.placeholder} />
-                                                        <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} /> */}
                                                 </View>
                                         </View>
                                 </View>
@@ -330,7 +299,12 @@ export default function AddTransactionScreen() {
 
                         </ScrollView>
 
-                        <CategoryPickerModal visible={modalVisible} onClose={() => setModalVisible(false)} categories={categories!} onSelectCategory={setSelectedCategory} />
+                        <CategoryPickerModal
+                                visible={modalVisible}
+                                onClose={() => setModalVisible(false)}
+                                categories={categories!}
+                                onSelectCategory={setSelectedCategory}
+                        />
 
                         {showDatePicker && (
                                 <DateTimePicker
