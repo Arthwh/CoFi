@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
-import { TransactionStatus } from '../types/TransactionStatusType';
+import { theme } from '../../../theme';
+import { TransactionStatus } from '../../../types/TransactionStatusType';
 
 interface StatusPickerProps {
         status: TransactionStatus;

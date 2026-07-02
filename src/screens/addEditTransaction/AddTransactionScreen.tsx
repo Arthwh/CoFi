@@ -1,18 +1,19 @@
 import { Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { theme } from '../theme';
-import { CategoryPickerModal } from '../components/CategoryPickerModal';
-import { LoadingIndicator } from '../components/LoadingIndicator';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RootStackParamList } from '../types/navigation';
-import { TransactionTypePicker } from '../components/TransactionTypePicker';
-import { TransactionOptionalDataForm } from '../components/TransactionOptionalDataForm';
-import { TransactionPaymentFrequencyDataForm } from '../components/TransactionPaymentFrequencyDataForm';
-import { TransactionNotificationOptionsCard } from '../components/TransactionNotificationOptionsCard';
-import { TransactionBasicDataForm } from '../components/TransactionBasicDataForm';
-import { TransactionStatusAndAmountDataForm } from '../components/TransactionStatusAndAmountDataForm';
-import { useAddEditTransaction } from '../hooks/useAddEditTransaction';
-import { formatTagsFromStringToMap } from '../utils/tagsUtils';
+
+import { RootStackParamList } from '../../types/navigation';
+import { LoadingIndicator } from '../../components/LoadingIndicator';
+import { TransactionTypePicker } from './components/TransactionTypePicker';
+import { TransactionStatusAndAmountDataForm } from './components/TransactionStatusAndAmountDataForm';
+import { TransactionNotificationOptionsCard } from './components/TransactionNotificationOptionsCard';
+import { TransactionBasicDataForm } from './components/TransactionBasicDataForm';
+import { TransactionPaymentFrequencyDataForm } from './components/TransactionPaymentFrequencyDataForm';
+import { TransactionOptionalDataForm } from './components/TransactionOptionalDataForm';
+import { formatTagsFromStringToMap } from '../../utils/tagsUtils';
+import { CategoryPickerModal } from './components/CategoryPickerModal';
+import { theme } from '../../theme';
+import { useAddEditTransaction } from './hooks/useAddEditTransaction'
 
 export default function AddTransactionScreen() {
         const route = useRoute<RouteProp<RootStackParamList, 'Adicionar'>>();

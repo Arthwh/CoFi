@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Modal, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
-import { Transaction } from '../dtos/TransactionDto';
+import { theme } from '../../../theme';
+import { Transaction } from '../../../dtos/TransactionDto';
 
 interface TransactionDetailsModalProps {
         visible: boolean;

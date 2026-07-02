@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { PaymentMethod } from '../dtos/PaymentMethodDto';
-import { CustomIconTextButton } from './CustomIconTextButton';
+import { PaymentMethod } from '../../../dtos/PaymentMethodDto';
+import { CustomIconTextButton } from '../../../components/CustomIconTextButton';
 
 interface PaymentMethodPickerProps {
         selected: PaymentMethod | null;

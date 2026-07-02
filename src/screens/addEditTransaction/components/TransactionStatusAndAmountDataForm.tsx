@@ -1,9 +1,9 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import { TransactionStatusPicker } from "./TransactionStatusPicker";
-import { theme } from "../theme";
-import { TransactionStatus } from "../types/TransactionStatusType";
-import { TransactionType } from "../types/TransactionTypeType";
-import { formatAmountToString } from '../utils/moneyUtils'
+import { theme } from "../../../theme";
+import { TransactionStatus } from "../../../types/TransactionStatusType";
+import { TransactionType } from "../../../types/TransactionTypeType";
+import { formatAmountToString } from '../../../utils/moneyUtils'
 
 interface TransactionStatusAndAmountDataFormProps {
         amount: string,

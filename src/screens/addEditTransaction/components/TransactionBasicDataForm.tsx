@@ -1,7 +1,7 @@
 import { View, TextInput, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { theme } from "../theme";
+import { theme } from "../../../theme";
 import { Ionicons } from "@expo/vector-icons";
-import { Category } from "../dtos/CategoryDto";
+import { Category } from "../../../dtos/CategoryDto";
 
 interface TransactionBasicDataFormProps {
         description: string,

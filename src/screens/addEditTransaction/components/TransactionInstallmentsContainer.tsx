@@ -1,5 +1,5 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import { theme } from "../theme";
+import { theme } from "../../../theme";
 
 interface TransactionInstallmentsContainerProps {
         isEditing: boolean,

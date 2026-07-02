@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, View, StyleSheet, Text } from "react-native";
-import { theme } from "../theme";
-import { TransactionType } from "../types/TransactionTypeType";
+import { TransactionType } from "../../../types/TransactionTypeType";
+import { theme } from "../../../theme";
 
 interface TransactionTypePickerProps {
         type: TransactionType,

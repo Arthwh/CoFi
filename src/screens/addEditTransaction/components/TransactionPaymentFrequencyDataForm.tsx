@@ -1,8 +1,8 @@
 import { View, Text } from "react-native";
-import { theme } from "../theme";
+import { theme } from "../../../theme";
 import { PaymentMethodPicker } from "./PaymentMethodPicker";
-import { PaymentMethod } from "../dtos/PaymentMethodDto";
-import { TransactionFrequency } from "../types/TransactionFrequencyType";
+import { PaymentMethod } from "../../../dtos/PaymentMethodDto";
+import { TransactionFrequency } from "../../../types/TransactionFrequencyType";
 import { TransactionFrequencyPicker } from "./TransactionFrequencyPicker";
 import { TransactionInstallmentsContainer } from "./TransactionInstallmentsContainer";
 

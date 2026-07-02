@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
-import { Category } from '../dtos/CategoryDto';
+import { theme } from '../../../theme';
+import { Category } from '../../../dtos/CategoryDto';
 
 interface CategoryPickerModalProps {
         visible: boolean;

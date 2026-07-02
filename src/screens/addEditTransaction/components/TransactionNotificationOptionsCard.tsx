@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Switch, StyleSheet } from "react-native";
-import { theme } from "../theme";
+import { theme } from "../../../theme";
 import { Ionicons } from "@expo/vector-icons";
 
 interface TransactionNotificationOptionsCardProps {

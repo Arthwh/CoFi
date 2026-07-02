@@ -1,17 +1,18 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
-import { TransactionFilters, FilterType } from '../components/TransactionFilters';
-import { TransactionDetailsModal } from '../components/TransactionDetailsModal';
-import { transactionService } from '../services/transactionService';
-import { dateUtils, DateInfo } from '../utils/dateUtils'
-import { LoadingIndicator } from '../components/LoadingIndicator';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, SectionList } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { handleError } from '../utils/errorHandler';
-import { AppConfirm } from '../components/CustomConfirmModal';
-import { AppToast } from '../utils/toast';
-import { Transaction } from '../dtos/TransactionDto';
+import { Ionicons } from '@expo/vector-icons';
+
+import { theme } from '../../theme';
+import { TransactionFilters, FilterType } from './components/TransactionFilters';
+import { TransactionDetailsModal } from './components/TransactionDetailsModal';
+import { transactionService } from '../../services/transactionService';
+import { dateUtils, DateInfo } from '../../utils/dateUtils'
+import { LoadingIndicator } from '../../components/LoadingIndicator';
+import { handleError } from '../../utils/errorHandler';
+import { AppConfirm } from '../../components/CustomConfirmModal';
+import { AppToast } from '../../utils/toast';
+import { Transaction } from '../../dtos/TransactionDto';
 
 export default function TransactionsListScreen() {
         const navigation = useNavigation();

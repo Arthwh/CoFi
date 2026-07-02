@@ -1,5 +1,5 @@
 import { ScrollView, TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import { theme } from '../theme';
+import { theme } from '../../../theme';
 
 export type FilterType = 'all' | 'income' | 'expense' | 'unpaid';
 

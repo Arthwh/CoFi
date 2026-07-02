@@ -1,7 +1,7 @@
 import { View } from "react-native"
-import { CustomIconTextButton } from "./CustomIconTextButton"
-import { theme } from "../theme"
-import { TransactionFrequency } from "../types/TransactionFrequencyType"
+import { theme } from "../../../theme"
+import { TransactionFrequency } from "../../../types/TransactionFrequencyType"
+import { CustomIconTextButton } from "../../../components/CustomIconTextButton"
 
 interface TransactionFrequencyPickerProps {
         frequency: TransactionFrequency,

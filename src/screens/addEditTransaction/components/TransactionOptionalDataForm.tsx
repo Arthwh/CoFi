@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Switch, StyleSheet } from "react-native";
-import { theme } from "../theme";
-import { formatTagsFromMapToString } from "../utils/tagsUtils";
+import { theme } from "../../../theme";
+import { formatTagsFromMapToString } from "../../../utils/tagsUtils";
 
 interface TransactionOptionalDataFormProps {
         payee: string | null,
