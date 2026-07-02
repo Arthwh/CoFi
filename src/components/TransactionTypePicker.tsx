@@ -5,23 +5,26 @@ import { TransactionType } from "../types/TransactionTypeType";
 
 interface TransactionTypePickerProps {
         type: TransactionType,
+        isEditing: boolean,
         onPress: (type: TransactionType) => void
 }
 
-export function TransactionTypePicker({ type, onPress }: TransactionTypePickerProps) {
+export function TransactionTypePicker({ type, isEditing, onPress }: TransactionTypePickerProps) {
         return (
                 < View style={styles.typeSelectorRow} >
                         <TouchableOpacity
-                                style={[styles.typeButton, type === 'income' && styles.modernIncomeActive]}
+                                style={[styles.typeButton, type === 'income' && styles.modernIncomeActive, isEditing && { opacity: 0.5 }]}
                                 onPress={() => onPress('income')}
+                                disabled={isEditing}
                         >
                                 <Ionicons name="arrow-up-circle" size={22} color={type === 'income' ? '#10B981' : theme.colors.textLight} />
                                 <Text style={[styles.typeButtonText, type === 'income' && styles.textIncome]}>Entrada</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                                style={[styles.typeButton, type === 'expense' && styles.modernExpenseActive]}
+                                style={[styles.typeButton, type === 'expense' && styles.modernExpenseActive, isEditing && { opacity: 0.5 }]}
                                 onPress={() => onPress('expense')}
+                                disabled={isEditing}
                         >
                                 <Ionicons name="arrow-down-circle" size={22} color={type === 'expense' ? '#EF4444' : theme.colors.textLight} />
                                 <Text style={[styles.typeButtonText, type === 'expense' && styles.textExpense]}>Saída</Text>

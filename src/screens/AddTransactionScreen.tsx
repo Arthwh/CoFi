@@ -50,7 +50,7 @@ export default function AddTransactionScreen() {
                                 <Text style={styles.headerTitle}>{isEditing ? 'Editar Movimentação' : 'Nova Movimentação'}</Text>
 
                                 {/* Seletor de Tipo de Movimentação */}
-                                <TransactionTypePicker type={type} onPress={setType} />
+                                <TransactionTypePicker type={type} onPress={setType} isEditing={isEditing} />
 
                                 {/* Valor e Status */}
                                 <TransactionStatusAndAmountDataForm
@@ -86,6 +86,7 @@ export default function AddTransactionScreen() {
                                         selectedPaymentMethod={selectedPaymentMethod!}
                                         frequency={frequency!}
                                         installmentsCount={installmentsCount}
+                                        isEditing={isEditing}
                                         setSelectedPaymentMethod={setSelectedPaymentMethod}
                                         setFrequency={setFrequency}
                                         setInstallmentsCount={setInstallmentsCount}

@@ -16,7 +16,6 @@ import { TransactionFrequency } from "../types/TransactionFrequencyType";
 import { TransactionStatus } from "../types/TransactionStatusType";
 import { TransactionType } from "../types/TransactionTypeType";
 import { RootStackParamList } from "../types/navigation";
-import { formatTagsFromMapToString, formatTagsFromStringToMap } from "../utils/tagsUtils";
 
 interface useAddEditTransactionProps {
         route: RouteProp<RootStackParamList, "Adicionar">
@@ -44,7 +43,7 @@ export function useAddEditTransaction({ route, navigation }: useAddEditTransacti
         const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
         // Frequência e Parcelamento
         const [frequency, setFrequency] = useState<TransactionFrequency | null>(null);
-        const [installmentsCount, setInstallmentsCount] = useState('2');
+        const [installmentsCount, setInstallmentsCount] = useState<string>('2');
         // Outros dados opcionais
         const [payee, setPayee] = useState<string | null>(null);
         const [tags, setTags] = useState<string[] | null>(null);
@@ -86,11 +85,11 @@ export function useAddEditTransaction({ route, navigation }: useAddEditTransacti
                         setPayee(transactionToEdit.payee);
                         setStatus(transactionToEdit.status);
                         setFrequency(transactionToEdit.frequency)
-                        setInstallmentsCount(transactionToEdit.installments)
+                        setInstallmentsCount(String(transactionToEdit.installments))
                         setTags(transactionToEdit.tags)
                         setIgnoreInDashboard(transactionToEdit.ignore_in_dashboard)
                         setNotifyMe(transactionToEdit.notify_me)
-                        setDaysBeforeNotify(transactionToEdit.days_before_notify)
+                        setDaysBeforeNotify(String(transactionToEdit.days_before_notify))
                 }
         }, [transactionToEdit, isEditing]);
 
@@ -152,7 +151,7 @@ export function useAddEditTransaction({ route, navigation }: useAddEditTransacti
                         status,
                         payment_method_id: selectedPaymentMethod!.id,
                         frequency: frequency!,
-                        installments: frequency === 'installment' ? parseInt(installmentsCount) : 1,
+                        installments: frequency === 'installment' && installmentsCount ? parseInt(installmentsCount) : 1,
                         payee: payee ? payee : null,
                         tags: tags ? tags : null,
                         ignore_in_dashboard: ignoreInDashboard,
