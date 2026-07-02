@@ -1,15 +1,15 @@
 import { View } from "react-native"
-import { CustomIconTextButton } from "./CustomTextButton"
+import { CustomIconTextButton } from "./CustomIconTextButton"
 import { theme } from "../theme"
 import { TransactionFrequency } from "../types/TransactionFrequencyType"
 
-interface TransactionFrequencyPickerProps{
-        frequency: TransactionFrequency, 
-        isEditing: boolean, 
+interface TransactionFrequencyPickerProps {
+        frequency: TransactionFrequency,
+        isEditing: boolean,
         setFrequency: (frequency: TransactionFrequency) => void
 }
 
-export function TransactionFrequencyPicker({frequency, isEditing, setFrequency}: TransactionFrequencyPickerProps) {
+export function TransactionFrequencyPicker({ frequency, isEditing, setFrequency }: TransactionFrequencyPickerProps) {
         return (
                 <View style={theme.styles.inputRow}>
                         <CustomIconTextButton
@@ -17,7 +17,7 @@ export function TransactionFrequencyPicker({frequency, isEditing, setFrequency}:
                                 onPress={() => setFrequency('single')}
                                 active={frequency === 'single'}
                                 disabled={isEditing}
-                                style={{ flex: 1 }}
+                                style={{ flex: 1, paddingHorizontal: theme.spacing.xl }}
                         />
                         <CustomIconTextButton
                                 text={"Parcelada"}

@@ -8,7 +8,7 @@ interface CustomIconTextButtonProps {
         onPress: () => void;
         active?: boolean;       // Se o botão está selecionado
         disabled?: boolean;     // Se o botão está bloqueado
-        icon?: React.ComponentProps<typeof Ionicons>['name']; // Ícone opcional
+        icon?: string; // Ícone opcional
         style?: StyleProp<ViewStyle>; // Permite passar estilos extras
 }
 
@@ -39,7 +39,7 @@ export function CustomIconTextButton({
                         activeOpacity={0.7}
                 >
                         {icon && (
-                                <Ionicons name={icon} size={18} color={getIconColor()} />
+                                <Ionicons name={icon as any} size={18} color={getIconColor()} />
                         )}
                         
                         <Text style={[
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
                 borderColor: theme.colors.border,
                 borderRadius: theme.borderRadius.lg,
                 paddingVertical: theme.spacing.sm,
+                paddingHorizontal: theme.spacing.sm,
         },
         btnActive: {
                 backgroundColor: theme.colors.primary,

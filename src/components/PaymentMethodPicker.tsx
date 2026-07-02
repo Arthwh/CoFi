@@ -1,7 +1,6 @@
-import { ScrollView, TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../theme';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { PaymentMethod } from '../dtos/PaymentMethodDto';
+import { CustomIconTextButton } from './CustomIconTextButton';
 
 interface PaymentMethodPickerProps {
         selected: PaymentMethod | null;
@@ -17,15 +16,14 @@ export function PaymentMethodPicker({ selected, paymentMethods, onChange, isEdit
                                 {paymentMethods.map((method) => {
                                         const isActive = selected?.id === method.id;
                                         return (
-                                                <TouchableOpacity
-                                                        key={method.id}
-                                                        style={[styles.chip, isActive && styles.chipActive, isActive && isEditing && styles.chipDisabled]}
+                                                <CustomIconTextButton
+                                                        text={method.name}
                                                         onPress={() => onChange(method)}
+                                                        active={isActive}
                                                         disabled={isEditing}
-                                                >
-                                                        <Ionicons name={method.icon as any} size={18} color={isActive ? theme.colors.white : theme.colors.textLight} />
-                                                        <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{method.name}</Text>
-                                                </TouchableOpacity>
+                                                        icon={method.icon}
+                                                        style={{ flex: 1 }}
+                                                />
                                         );
                                 })}
                         </ScrollView>
@@ -35,9 +33,4 @@ export function PaymentMethodPicker({ selected, paymentMethods, onChange, isEdit
 
 const styles = StyleSheet.create({
         scrollContent: { paddingHorizontal: 20, gap: 10, paddingVertical: 4 },
-        chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.colors.background, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', gap: 6 },
-        chipActive: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
-        chipDisabled: { backgroundColor: theme.colors.primaryDisabled, borderColor: theme.colors.primaryDisabled },
-        chipText: { fontSize: 14, fontWeight: '500', color: theme.colors.textLight },
-        chipTextActive: { color: theme.colors.white },
 });
